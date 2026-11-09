@@ -385,6 +385,9 @@ header.top{display:flex;justify-content:space-between;align-items:flex-start;gap
 .about span{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:3px}
 .nchips{display:flex;flex-wrap:wrap;gap:5px}
 .nchips i{font-style:normal;font-size:12.5px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.wheel .sl{pointer-events:none;transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .2s ease}
+.wheel .sl.sel{transform:translate(var(--tx),var(--ty))}
+.wheel .sl.dim{opacity:.3}
 .labbox{margin-top:12px;border:1px solid rgba(240,179,65,.35);border-radius:16px;padding:12px;background:rgba(240,179,65,.04);display:grid;gap:8px}
 .labbox .calc,.labbox .story{margin-top:0}
 .lbh{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600}
@@ -656,9 +659,11 @@ function renderSheet(intro){
     svg+=`<path d="${arc(cx,cy,100,158,s.a0,s.a1)}" fill="${icol(s.n)}" data-i="${s.n}" style="--tx:${(7*Math.sin(mid)).toFixed(2)}px;--ty:${(-7*Math.cos(mid)).toFixed(2)}px"><title>${s.n}${lab?" "+P+fmt(s.pct)+"%":""}</title></path>`;});
   svg+=`</g><g class="gl">`;
   segs.forEach(s=>{const mid=(s.a0+s.a1)/2, w=s.a1-s.a0, x=cx+129*Math.sin(mid), y=cy-129*Math.cos(mid), c=ink(icol(s.n)), k=IMAP[s.n];
+    svg+=`<g class="sl" data-li="${s.n}" style="--tx:${(7*Math.sin(mid)).toFixed(2)}px;--ty:${(-7*Math.cos(mid)).toFixed(2)}px">`;
     if(lab){ if(w>0.42&&k) svg+=`<svg class="sico" x="${x-8}" y="${y-17}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg><text class="lbl" style="fill:${c}" x="${x}" y="${y+12}" text-anchor="middle">${fmt(s.pct,0)}%</text>`;
              else if(w>0.32) svg+=`<text class="lbl" style="fill:${c}" x="${x}" y="${y+4}" text-anchor="middle">${fmt(s.pct,0)}%</text>`; }
     else if(w>0.2&&k){const z=Math.min(30,Math.max(18,w*52)); svg+=`<svg class="sico" x="${x-z/2}" y="${y-z/2}" width="${z}" height="${z}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;}
+    svg+=`</g>`;
   });
   svg+=`</g><g class="ctr"><text class="ctr1" x="${cx}" y="${cy+6}" text-anchor="middle"></text><text class="ctr2" x="${cx}" y="${cy+26}" text-anchor="middle"></text></g></svg>`;
   const i=PUB.indexOf(p);
@@ -719,6 +724,8 @@ function applySel(anim=true){
   pan.querySelectorAll(".gs path").forEach(el=>{const n=el.getAttribute("data-i"), s=segs.find(x=>x.n===n);
     el.classList.toggle("dim",!!SEL&&(selI?n!==selI:s.k!==selB)); el.classList.toggle("sel",n===selI);
     if(n===selI) el.parentNode.appendChild(el);});
+  pan.querySelectorAll(".gl .sl").forEach(el=>{const n=el.getAttribute("data-li"), s=segs.find(x=>x.n===n);
+    el.classList.toggle("dim",!!SEL&&(selI?n!==selI:s.k!==selB)); el.classList.toggle("sel",n===selI);});
   pan.querySelectorAll(".gb path").forEach(el=>{const k=el.getAttribute("data-b");
     el.classList.toggle("dim",!!SEL&&k!==selK); el.classList.toggle("sel",k===selB); if(k===selB) el.parentNode.appendChild(el);});
   pan.querySelectorAll(".bandsum [data-b]").forEach(el=>el.setAttribute("aria-pressed",el.getAttribute("data-b")===selB));
