@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profumi fai-da-te</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0d0b09; --surface:#16130f; --surface2:#1e1a14; --line:#2e281f;
+  --ink:#f3ebdd; --ink2:#c9bda8; --muted:#948977;
+  --amber:#f0b341; --amber-d:#c98500; --amber-soft:rgba(240,179,65,.12);
+  --testa:#c98500; --cuore:#d55181; --fondo:#5a8fd0;
+  --pos:#58b894; --neg:#e07a6e; --neu:#c9bda8;
+  --serif:'Instrument Serif',Georgia,'Times New Roman',serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:radial-gradient(1000px 420px at 12% -10%,rgba(240,179,65,.08),transparent 60%),var(--bg);color:var(--ink);font:400 15px/1.45 var(--sans);-webkit-text-size-adjust:100%}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 60px}
+h1,h2,h3{font-family:var(--serif);font-weight:400;margin:0}
+h1{font-size:clamp(34px,6vw,52px);line-height:1}
+h1 em{color:var(--amber)}
+.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:600}
+.sub{color:var(--muted);margin:8px 0 0;font-size:14px}
+
+/* tabs */
+.tabs{display:flex;gap:4px;margin:22px 0 18px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow-x:auto;position:sticky;top:0;z-index:5;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 0 auto;background:none;border:0;color:var(--ink2);font:500 14px var(--sans);padding:9px 14px;border-radius:10px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{background:var(--amber);color:#1a1205}
+.pane[hidden]{display:none}
+.hint{color:var(--muted);font-size:13px;margin:0 0 12px}
+
+/* badge */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.badge.best{background:var(--amber);color:#1a1205}
+.badge.eval{border:1px dashed var(--amber);color:var(--amber);background:var(--amber-soft)}
+
+/* generic table */
+.tbl{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 12px;text-align:left;vertical-align:middle;font-size:13.5px}
+thead th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line);background:var(--surface2)}
+tbody td{border-top:1px solid var(--line)}
+tbody tr:first-child td{border-top:0}
+td.r,th.r{text-align:right}
+.muted{color:var(--muted)}
+.ink2{color:var(--ink2)}
+
+/* comparator */
+.fam{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
+.fam button{background:var(--surface);color:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:11px 8px;font:500 14px var(--sans);cursor:pointer;text-align:center;line-height:1.2}
+.fam button small{display:block;font-size:11px;color:var(--muted);margin-top:3px;font-weight:400}
+.fam button[aria-pressed=true]{background:var(--amber);color:#1a1205;border-color:var(--amber)}
+.fam button[aria-pressed=true] small{color:#4a3512}
+.chg{background:var(--amber-soft);border:1px solid rgba(240,179,65,.35);border-radius:14px;padding:11px 14px;margin-bottom:12px;font-size:13.5px;color:var(--ink2)}
+.chg b{color:var(--amber);font-weight:600}
+.cgrid{display:grid;grid-template-columns:1.25fr 1fr 1fr 84px;grid-template-areas:"n a b d";column-gap:10px;align-items:center}
+.cgrid>.n{grid-area:n}.cgrid>.a{grid-area:a}.cgrid>.b{grid-area:b}.cgrid>.d{grid-area:d;text-align:right;font-weight:600;white-space:nowrap}
+.hd{position:sticky;top:58px;z-index:4;background:var(--bg);padding:8px 0 10px}
+.vc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 12px;min-width:0}
+.vc.best{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber) inset}
+.vc.eval{border-style:dashed;border-color:var(--amber-d)}
+.vc .t{font-size:10px;letter-spacing:.14em;color:var(--amber);font-weight:600}
+.vc h3{font-size:22px;line-height:1.05;margin:2px 0 4px}
+.vc .m{font-size:12px;color:var(--ink2)}
+.vc .badge{margin-top:6px}
+.hd .d{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;align-self:end;padding-bottom:6px}
+.cbody{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.cbody .sec{background:var(--surface2);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;padding:9px 14px;border-top:1px solid var(--line)}
+.cbody .sec:first-child{border-top:0}
+.sn{display:block;font-size:11.5px;line-height:1.3;color:var(--muted);margin-top:3px;font-weight:400}
+.cbody .r{padding:10px 14px;border-top:1px solid var(--line);font-size:13.5px}
+.cbody .sec+.r{border-top:0}
+.r .n{color:var(--ink2)}
+.r .a,.r .b{min-width:0}
+.val{font-weight:500;color:var(--ink)}
+.mb{display:block;height:6px;border-radius:0 4px 4px 0;margin-top:5px;min-width:2px}
+.a .mb{opacity:.45}
+.d.up{color:var(--amber)}.d.dn{color:#8fb4e6}.d.eq{color:var(--muted);font-weight:400}
+.tagn{font-size:11px;font-weight:600;border-radius:999px;padding:1px 8px}
+.tagn.new{background:var(--amber-soft);color:var(--amber)}.tagn.gone{background:rgba(143,180,230,.14);color:#8fb4e6}
+.stack{display:flex;gap:2px;height:24px;min-width:0}
+.seg{border-radius:3px;display:flex;align-items:center;justify-content:center;font:600 11px var(--sans);color:#14110d;overflow:hidden}
+.seg:first-child{border-radius:7px 3px 3px 7px}.seg:last-child{border-radius:3px 7px 7px 3px}.seg:only-child{border-radius:7px}
+.seg.testa{background:var(--testa)}.seg.cuore{background:var(--cuore)}.seg.fondo{background:var(--fondo)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:7px}
+.notes{padding:12px 14px;font-size:13px;color:var(--ink2)}
+.legend{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px}
+.gap{height:0}
+
+
+.cbody .r.ing{cursor:pointer}
+.cbody .r.ing:hover{background:rgba(255,255,255,.02)}
+.cbody .r.ing .sn{display:none}
+.cbody .r.ing.open .sn{display:block;color:var(--ink2);font-size:12.5px}
+.nm{display:inline-flex;align-items:center;gap:7px}
+.nm .dot{margin:0}
+.nm::after{content:"+";color:var(--muted);font-size:13px;margin-left:2px}
+.r.ing.open .nm::after{content:"–"}
+.tgl{display:block;width:100%;background:none;border:0;border-top:1px solid var(--line);color:var(--amber);font:500 13px var(--sans);padding:12px;cursor:pointer}
+.tgl:hover{background:rgba(255,255,255,.02)}
+.hintrow{padding:8px 14px 2px;font-size:12px;color:var(--muted)}
+.cbody details{border-top:1px solid var(--line)}
+.cbody summary{padding:12px 14px;color:var(--amber);font-size:13px;font-weight:500;cursor:pointer;list-style:none}
+.cbody summary::-webkit-details-marker{display:none}
+.cbody summary::before{content:"+ "}
+.cbody details[open] summary::before{content:"– "}
+.cbody details .nb{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 14px 14px;font-size:13px;color:var(--ink2)}
+.foot details summary{cursor:pointer;color:var(--ink2)}
+.foot details div{margin-top:6px}
+.lg2{display:inline-flex;gap:10px;margin-left:6px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink2)}
+.lg2 i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{position:relative;display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:border-color .15s,transform .15s}
+.tile:hover,.tile:focus-visible{border-color:var(--amber);outline:none;transform:translateY(-1px)}
+.tile.best{border-color:rgba(240,179,65,.7)}
+.tile svg{flex:none;width:54px;height:54px}
+.tile h3{font-size:20px;line-height:1.05}
+.tile .m{font-size:12px;color:var(--muted);margin-top:3px}
+.tile .star{position:absolute;top:8px;right:10px;font-size:12px;color:var(--amber)}
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center}
+#sheet[hidden]{display:none}
+.scrim{position:absolute;inset:0;background:rgba(5,4,3,.72);backdrop-filter:blur(4px)}
+.panel{position:relative;width:min(560px,94vw);max-height:92vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px 18px 20px;box-shadow:0 24px 60px rgba(0,0,0,.6);animation:pop .18s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.sh-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.sh-top h2{font-size:30px;line-height:1}
+.sh-top .m{font-size:12.5px;color:var(--muted);margin-top:5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.icb{flex:none;width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--line);color:var(--ink2);font:500 16px var(--sans);cursor:pointer;display:grid;place-items:center}
+.icb:hover{border-color:var(--amber);color:var(--amber)}
+.sh-nav{display:flex;gap:6px}
+.wheel{display:block;width:100%;max-width:330px;margin:8px auto 0;touch-action:manipulation}
+.wheel path{cursor:pointer;transition:opacity .15s;stroke:var(--surface);stroke-width:2}
+.wheel path.dim{opacity:.22}
+.wheel path.sel{stroke:var(--amber);stroke-width:2.5}
+.wheel path:focus{outline:none}
+.wheel .ctr1{font:400 34px var(--serif);fill:var(--ink)}
+.wheel .ctr2{font:500 11.5px var(--sans);fill:var(--muted);letter-spacing:.04em}
+.wheel .lbl{font:600 10.5px var(--sans);fill:#14110d;pointer-events:none}
+.info{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-top:10px;min-height:64px}
+.info h4{margin:0;font:400 22px/1.1 var(--serif);display:flex;align-items:center;gap:8px}
+.info .big{font:400 30px/1 var(--serif);color:var(--amber);margin-top:6px}
+.info .big small{font:500 12px var(--sans);color:var(--muted);margin-left:6px}
+.info dl{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:10px 0 0;font-size:13px}
+.info dt{color:var(--muted)}
+.info dd{margin:0;color:var(--ink2)}
+.info .hint2{font-size:13px;color:var(--muted);margin:0}
+.chipl{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chipl button{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);color:var(--ink2);border-radius:999px;padding:5px 10px;font:500 12.5px var(--sans);cursor:pointer}
+.chipl button:hover{border-color:var(--amber);color:var(--ink)}
+.chipl button b{color:var(--ink);font-weight:600}
+.chipl .dot{margin:0}
+.bandsum{display:flex;gap:6px;margin-top:10px}
+.bandsum button{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 6px;color:var(--muted);font:500 11.5px var(--sans);cursor:pointer;text-align:center}
+.bandsum button b{display:block;font:400 20px var(--serif);color:var(--ink);margin-top:2px}
+.bandsum button[aria-pressed=true]{border-color:var(--amber)}
+.sh-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px}
+.sh-foot .back{background:none;border:0;color:var(--muted);font:500 13px var(--sans);cursor:pointer;padding:6px 0}
+@media (max-width:720px){
+  .tiles{grid-template-columns:1fr 1fr;gap:8px}
+  .tile{flex-direction:column;align-items:flex-start;gap:8px;padding:12px}
+  .tile svg{width:58px;height:58px}
+  .tile h3{font-size:19px}
+  #sheet{align-items:flex-end}
+  .panel{width:100%;max-height:94vh;border-radius:22px 22px 0 0;padding:14px 14px 22px;animation:up .2s ease-out}
+  @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+  .sh-top h2{font-size:27px}
+}
+
+
+/* animazioni */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes wheelIn{from{opacity:0;transform:rotate(-60deg) scale(.82)}to{opacity:1;transform:none}}
+@keyframes popOut{to{opacity:0;transform:translateY(14px) scale(.98)}}
+@keyframes scrimOut{to{opacity:0}}
+button{transition:transform .12s ease,background-color .2s,border-color .2s,color .2s}
+button:active:not(:disabled){transform:scale(.96)}
+.pane:not([hidden]){animation:fadeIn .25s ease-out}
+.tile{animation:fadeUp .4s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*50ms)}
+.tile:active{transform:scale(.97)}
+.tile svg{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.tile:hover svg{transform:rotate(25deg)}
+.wheel.intro{animation:wheelIn .55s cubic-bezier(.2,.8,.2,1);transform-origin:50% 50%}
+.wheel path{transition:opacity .2s ease,transform .22s cubic-bezier(.2,.8,.2,1)}
+.wheel path.sel{transform:translate(var(--tx),var(--ty))}
+.wheel .ctr{transition:opacity .15s}
+.wheel .ctr.swap{animation:fadeIn .25s ease-out}
+.info.swap{animation:fadeUp .28s ease-out}
+.chipl button{animation:fadeUp .3s both;animation-delay:calc(var(--i)*35ms)}
+#sheet.closing .panel{animation:popOut .18s ease-in forwards}
+#sheet.closing .scrim{animation:scrimOut .18s ease-in forwards}
+.scrim{animation:fadeIn .2s ease-out}
+.chg,.hd,.cbody{animation:fadeUp .35s cubic-bezier(.2,.8,.2,1) both}
+.hd{animation-delay:.04s}.cbody{animation-delay:.08s}
+.cbody .r{animation:fadeUp .35s both;animation-delay:calc(.1s + var(--i,0)*30ms)}
+.mb{transform-origin:left;animation:grow .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:.2s}
+.stack{transform-origin:left;animation:grow .55s cubic-bezier(.2,.8,.2,1) both}
+.cbody .r.ing.open .sn{animation:fadeUp .22s ease-out}
+.node{transition:border-color .15s,transform .15s}
+.tl-lane{animation:fadeUp .35s both}
+.tl-lane:nth-child(3){animation-delay:.06s}.tl-lane:nth-child(4){animation-delay:.12s}
+.tabs button{transition:background-color .25s,color .25s,transform .12s}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* all-table */
+#all td.pn{font:400 19px/1.1 var(--serif);white-space:nowrap}
+#all tr.best td.pn{color:var(--amber)}
+.sorts{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.sorts button{background:var(--surface);color:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font:500 12.5px var(--sans);cursor:pointer}
+.sorts button[aria-pressed=true]{background:var(--amber);color:#1a1205;border-color:var(--amber)}
+.go{background:var(--bg);border:1px solid var(--line);color:var(--amber);border-radius:999px;padding:6px 12px;font:600 12px var(--sans);cursor:pointer;white-space:nowrap}
+.go:hover{border-color:var(--amber)}
+#cards{display:none;gap:10px}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.pc.best{border-color:var(--amber)}
+.pc .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.pc h3{font-size:24px;line-height:1.05}
+.pc .m{font-size:12px;color:var(--muted);margin-top:3px}
+.pc .stack{margin:12px 0 8px;height:26px}
+.pc .bands{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:12px;color:var(--muted)}
+.pc .bands b{display:block;font-size:15px;color:var(--ink);font-weight:600}
+.pc .foot2{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+
+/* conc bars in table */
+.cbar{display:flex;align-items:center;gap:8px;min-width:120px}
+.cbar i{display:block;height:10px;border-radius:0 4px 4px 0;background:#a7792b}
+.cbar.best i{background:var(--amber)}
+.cbar.eval i{background:repeating-linear-gradient(135deg,var(--amber-d) 0 4px,#4a3512 4px 8px)}
+
+/* timeline */
+.tl{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.tl-dates,.tl-row{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:34px}
+.tl-dates{margin-bottom:8px}
+.tl-dates div{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:6px}
+.tl-lane{margin-top:14px}
+.lane-name{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:7px}
+.node{position:relative;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;cursor:pointer;text-align:left;color:inherit;font:inherit;width:100%}
+.node:hover,.node:focus-visible{border-color:var(--amber);outline:none}
+.node h3{font-size:20px;line-height:1.1;margin-bottom:3px}
+.node .meta{font-size:12px;color:var(--ink2)}
+.node .delta{font-size:12px;color:var(--muted);margin-top:6px;border-top:1px dashed var(--line);padding-top:6px}
+.node .badge{margin-top:7px}
+.node.best{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber) inset}
+.node.eval{border-style:dashed}
+.node.goal{background:transparent;border:1px dashed var(--muted);cursor:default}
+.node.goal h3{color:var(--ink2)}
+.node.link::after{content:"";position:absolute;top:50%;right:-34px;width:34px;height:2px;background:var(--amber-d)}
+.node.link::before{content:"";position:absolute;top:calc(50% - 4px);right:-36px;border:5px solid transparent;border-left:7px solid var(--amber);border-right:0}
+
+/* feedback */
+td.pn2{font:400 19px/1.1 var(--serif);white-space:nowrap}
+td.pn2 small{display:block;font:400 11.5px var(--sans);color:var(--muted);margin-top:3px}
+.fb{display:flex;gap:6px;align-items:flex-start;line-height:1.3}
+.fb .ic{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:#14110d;margin-top:1px}
+.fb.pos .ic{background:var(--pos)}.fb.neg .ic{background:var(--neg)}.fb.neu .ic{background:var(--neu)}
+.tally{display:flex;gap:10px;margin-top:5px;font:500 11.5px var(--sans)}
+.tally .p{color:var(--pos)}.tally .n{color:var(--neg)}.tally .u{color:var(--neu)}
+.fb-key{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin:12px 4px 0}
+.tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
+.tag.warn{border-color:var(--neg);color:var(--neg)}
+
+.foot{margin-top:36px;border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--muted);display:grid;gap:4px}
+
+.mob{display:none}
+.sortbar{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-bottom:12px}
+.sortbar select{flex:1;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:11px 10px;font:500 16px var(--sans);min-height:44px}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.pc.best{border-color:rgba(240,179,65,.7)}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.pc h3{font-size:24px;line-height:1.1}
+.pc-sub{font-size:12px;color:var(--muted);margin:3px 0 10px}
+.pc-conc{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pc-conc b{font-size:15px;min-width:56px}
+.pc-conc i{display:block;height:10px;border-radius:0 5px 5px 0;background:#a7792b}
+.pc.best .pc-conc i{background:var(--amber)}
+.pc.eval .pc-conc i{background:repeating-linear-gradient(135deg,var(--amber-d) 0 4px,#4a3512 4px 8px)}
+.pc-bands{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.pc-bands div{background:var(--surface2);border-radius:10px;padding:7px 9px;font-size:12px;color:var(--muted)}
+.pc-bands b{display:block;font-size:15px;color:var(--ink);margin-top:1px}
+.pc .stack{height:26px}
+.pc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.pc-btns button{min-height:44px;border-radius:12px;background:var(--bg);border:1px solid var(--line);color:var(--ink);font:600 14px var(--sans);cursor:pointer}
+.pc-btns button.sel{background:var(--amber);color:#1a1205;border-color:var(--amber)}
+@media (max-width:720px){
+  .wrap{padding:16px 12px 48px}
+  h1{font-size:36px}
+  .sub{font-size:13px}
+  .tabs{gap:2px;padding:3px;margin:16px 0 14px;top:6px}
+  .tabs button{flex:1 1 0;padding:9px 2px;font-size:12px;text-align:center}
+  .hd{top:52px}
+  .cgrid{grid-template-columns:1fr 1fr 62px;grid-template-areas:"n n n" "a b d";row-gap:6px}
+  .hd.cgrid{grid-template-areas:"a b d"}
+  .hd .n{display:none}
+  .vc{padding:9px 10px}
+  .vc h3{font-size:19px}
+  .vc .m{font-size:11.5px}
+  .vc .badge{font-size:10px;padding:2px 7px;white-space:normal}
+  .cbody .r{padding:10px 12px;font-size:13px}
+  .r .n{font-size:12.5px;color:var(--ink2)}
+  .r.ing .n{color:var(--ink)}
+  .hd .d{font-size:10px;padding-bottom:4px}
+  .tl-dates{display:none}
+  .tl-row{grid-template-columns:1fr;gap:26px}
+  .tl-row .node{grid-column:auto!important}
+  .node.link::after{right:auto;left:50%;top:auto;bottom:-26px;width:2px;height:26px}
+  .node.link::before{right:auto;left:calc(50% - 4px);top:auto;bottom:-30px;border:5px solid transparent;border-top:7px solid var(--amber);border-bottom:0}
+  #alltbl{display:none}
+  #cards{display:grid}
+  /* feedback e diluizioni -> schede */
+  #fbt,#fbt tbody,#fbt tr,#fbt td,#dilt,#dilt tbody,#dilt tr,#dilt td{display:block}
+  #fbt thead,#dilt thead{display:none}
+  #fbt tr,#dilt tr{border-top:1px solid var(--line);padding:10px 4px}
+  #fbt tr:first-child,#dilt tr:first-child{border-top:0}
+  #fbt td,#dilt td{border:0;padding:3px 0}
+  #fbt td[data-l]::before,#dilt td[data-l]::before{content:attr(data-l);display:inline-block;min-width:62px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);vertical-align:top}
+  #fbt td[data-l]>*,#dilt td[data-l]>*{display:inline-flex;vertical-align:top;width:calc(100% - 70px)}
+  #fbt td.skip{display:none}
+  #fbt td.pn2{font-size:22px}
+  #dilt td.dn{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* modalità e lucchetto */
+header.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.lockbtn{flex:none;margin-top:2px;background:var(--surface);border:1px solid var(--line);color:var(--ink2);border-radius:999px;padding:8px 13px;font:500 12.5px var(--sans);cursor:pointer;white-space:nowrap}
+.lockbtn:hover{border-color:var(--amber);color:var(--ink)}
+.lockbtn.on{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
+
+#lock{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center}
+#lock[hidden]{display:none}
+.lockp{width:min(380px,92vw)}
+.lockp h2{font-size:28px}
+#pw{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--ink);font:500 16px var(--sans);outline:none}
+#pw:focus{border-color:var(--amber)}
+.err{color:var(--neg);font-size:13px;margin:8px 2px 0}
+.enter{width:100%;margin-top:12px;background:var(--amber);color:#1a1205;border:0;border-radius:12px;padding:12px;font:600 15px var(--sans);cursor:pointer}
+.enter:disabled{opacity:.7}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.lockp.shake{animation:shake .35s}
+/* calcolatore bottiglia */
+.calc{margin-top:10px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.calc summary{padding:12px 14px;color:var(--amber);font:500 13.5px var(--sans);cursor:pointer;list-style:none}
+.calc summary::-webkit-details-marker{display:none}
+.calc summary::before{content:"+ "}
+.calc[open] summary::before{content:"– "}
+#calcbody{padding:0 14px 12px;animation:fadeUp .25s ease-out}
+.sizes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.sizes button{background:var(--surface);border:1px solid var(--line);color:var(--ink2);border-radius:10px;padding:8px 0;font:600 13px var(--sans);cursor:pointer}
+.sizes button[aria-pressed=true]{background:var(--amber);border-color:var(--amber);color:#1a1205}
+.ctab td{padding:6px 2px;font-size:13px;border-top:1px solid var(--line)}
+.ctab tr:first-child td{border-top:0}
+.ctab td.r{text-align:right;font-weight:500;white-space:nowrap}
+.ctab .dot{margin-right:7px}
+.ctab tr.alc td{color:var(--ink2)}
+.ctab tr.tot td{font-weight:600;color:var(--ink);border-top:1px solid var(--muted)}
+.cnote{font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.4}
+@media (max-width:720px){ .lockbtn{padding:7px 11px;font-size:12px} header.top h1{font-size:34px} }
+
+.wheel .gb path.sel{transform:translate(var(--tx),var(--ty))}
+.style{font:400 17px/1.35 var(--serif);font-style:italic;color:var(--ink2);margin:10px 0 0}
+.method{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+.method b{color:var(--amber);font-weight:600}
+.story{margin-top:10px}
+.todo{margin:8px 0 0;font-size:12.5px;color:var(--amber);background:var(--amber-soft);border-radius:10px;padding:7px 10px}
+.pairs{display:flex;gap:6px;margin:-4px 0 12px;flex-wrap:wrap}
+.pairs button{background:var(--surface);border:1px solid var(--line);color:var(--ink2);border-radius:999px;padding:6px 12px;font:500 12.5px var(--sans);cursor:pointer}
+.pairs button[aria-pressed=true]{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
+.node .from{font-size:11.5px;color:var(--amber);margin-top:4px}
+.stb{padding:0 14px 12px;display:grid;gap:8px;font-size:13px;color:var(--ink2)}
+.stb span{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">Laboratorio olfattivo</div>
+    <h1>Profumi <em>fai-da-te</em></h1>
+    <p class="sub">Profumi fatti a mano, da zero, con materie prime. Tocca un profumo per vedere com'è fatto.</p>
+  </div>
+  <button class="lockbtn" id="lockbtn" aria-label="Laboratorio"></button>
+</header>
+
+<nav class="tabs" role="tablist" id="tabs"></nav>
+
+<div class="pane" id="p-all"><div class="tiles" id="tiles"></div></div>
+<div class="pane" id="p-cmp" hidden>
+  <div class="fam" id="fam" role="group" aria-label="Famiglia di profumi"></div>
+  <div id="cmpout"></div>
+</div>
+<div class="pane" id="p-ver" hidden>
+  <p class="hint">Le versioni in ordine di data. Tocca una formula per aprirla.</p>
+  <div class="tl" id="timeline"></div>
+</div>
+<div class="pane" id="p-fb" hidden>
+  <p class="hint" id="fbhint"></p>
+  <div class="tbl"><div class="scroll"><table id="fbt"></table></div></div>
+  <div class="fb-key"><span><b style="color:var(--pos)">+</b> positivo</span><span><b style="color:var(--neg)">−</b> negativo</span><span><b style="color:var(--neu)">~</b> dubbioso</span><span>— non ha provato</span></div>
+</div>
+<div class="pane" id="p-dil" hidden>
+  <p class="hint">Soluzioni madre in alcol usate nelle formule.</p>
+  <div class="tbl"><table id="dilt"></table></div>
+</div>
+
+<div class="foot"><details><summary>Note e legenda</summary><div id="notes"></div></details></div>
+</div>
+
+<div id="sheet" hidden><div class="scrim" data-close></div><div class="panel" role="dialog" aria-modal="true" aria-labelledby="sh-title" id="panel"></div></div>
+
+<div id="lock" hidden><div class="scrim" data-lclose></div>
+  <form class="panel lockp" id="lockform" autocomplete="off">
+    <div class="sh-top"><h2>Laboratorio</h2><button type="button" class="icb" data-lclose aria-label="Chiudi">✕</button></div>
+    <p class="hint" style="margin:8px 0 12px">Formule, grammi, confronti e feedback. Serve la password.</p>
+    <input type="password" id="pw" placeholder="Password" aria-label="Password" autocomplete="current-password">
+    <p class="err" id="pwerr" hidden>Password errata.</p>
+    <button type="submit" class="enter" id="enter">Entra</button>
+  </form>
+</div>
+
+<script>
+const PUB=[{"id":"mol1","name":"Molecolare #1","date":"02/11","line":"Molecolare","conc":"14,8","status":"base","from":null,"style":null,"method":null,"approx":false,"bands":{"testa":0,"cuore":0,"fondo":100},"ings":[{"n":"Ambroxide","band":"fondo","assigned":true},{"n":"Cashmeran","band":"fondo","assigned":true},{"n":"Iso E Super","band":"fondo","assigned":true}]},{"id":"hug1","name":"Hug Me #1","date":"02/11","line":"Hug Me","conc":"13,8","status":"base","from":null,"style":null,"method":null,"approx":false,"bands":{"testa":0,"cuore":42.9,"fondo":57.1},"ings":[{"n":"alpha Isomethyl ionone","band":"cuore","assigned":true},{"n":"Galaxolide","band":"fondo","assigned":true},{"n":"Hedione","band":"cuore","assigned":true},{"n":"Iso E Super","band":"fondo","assigned":true}]},{"id":"hug2","name":"Hug Me v2","date":"03/11","line":"Hug Me","conc":"21","status":"base","from":"hug1","style":null,"method":null,"approx":false,"bands":{"testa":13.3,"cuore":36.1,"fondo":50.6},"ings":[{"n":"alpha Isomethyl ionone","band":"cuore","assigned":true},{"n":"Ambroxide","band":"fondo","assigned":true},{"n":"Bergamotto","band":"testa","assigned":true},{"n":"Galaxolide","band":"fondo","assigned":true},{"n":"Hedione","band":"cuore","assigned":true},{"n":"Iso E Super","band":"fondo","assigned":true}]},{"id":"mol2","name":"Molecolare #2","date":"03/11","line":"Molecolare","conc":"14,7","status":"base","from":"mol1","style":null,"method":null,"approx":false,"bands":{"testa":0,"cuore":0,"fondo":100},"ings":[{"n":"Ambroxide","band":"fondo","assigned":true},{"n":"Cashmeran","band":"fondo","assigned":true},{"n":"Habanolide","band":"fondo","assigned":true},{"n":"Iso E Super","band":"fondo","assigned":true}]},{"id":"sp1","name":"Sperimentale #1","date":"03/11","line":"Sperimentale","conc":"18","status":"best","from":null,"style":null,"method":null,"approx":true,"bands":{"testa":11.9,"cuore":42.6,"fondo":45.5},"ings":[{"n":"alpha Isomethyl ionone","band":"cuore","assigned":false},{"n":"Benzyl salicylate","band":"fondo","assigned":false},{"n":"Bergamotto","band":"testa","assigned":false},{"n":"Citronellol","band":"cuore","assigned":false},{"n":"Ethylene brassylate","band":"fondo","assigned":false},{"n":"Habanolide","band":"fondo","assigned":false},{"n":"Hedione","band":"cuore","assigned":false},{"n":"Ionone beta","band":"cuore","assigned":false},{"n":"Iso E Super","band":"fondo","assigned":false},{"n":"PEA","band":"cuore","assigned":false},{"n":"Pink pepper","band":"testa","assigned":false}]},{"id":"sp2","name":"Sperimentale #2","date":"04/11","line":"Sperimentale","conc":"16,7","status":"eval","from":"sp1","style":null,"method":null,"approx":true,"bands":{"testa":11.5,"cuore":44.1,"fondo":44.4},"ings":[{"n":"alpha Isomethyl ionone","band":"cuore","assigned":false},{"n":"Benzyl salicylate","band":"fondo","assigned":false},{"n":"Bergamotto","band":"testa","assigned":false},{"n":"Cassis","band":"cuore","assigned":true},{"n":"Citronellol","band":"cuore","assigned":false},{"n":"Ethylene brassylate","band":"fondo","assigned":false},{"n":"Habanolide","band":"fondo","assigned":false},{"n":"Hedione","band":"cuore","assigned":false},{"n":"IBQ","band":"fondo","assigned":true},{"n":"Ionone beta","band":"cuore","assigned":false},{"n":"Iso E Super","band":"fondo","assigned":false},{"n":"PEA","band":"cuore","assigned":false},{"n":"Pink pepper","band":"testa","assigned":false},{"n":"Raspberry ketone","band":"cuore","assigned":true}]},{"id":"marco1","name":"Marco #1 v2","date":"07/11","line":"Marco","conc":"17","status":"base","from":null,"style":"Molecolare ambra, pelle e violetta, con rosa, frutti rossi e un tocco di pesca.","method":"Marco","approx":true,"bands":{"testa":0,"cuore":59.2,"fondo":40.8},"ings":[{"n":"Aldehyde C14","band":"cuore","assigned":true},{"n":"Ambroxide","band":"fondo","assigned":true},{"n":"Amyl salicylate","band":"cuore","assigned":true},{"n":"Cassis","band":"cuore","assigned":true},{"n":"IBQ","band":"fondo","assigned":true},{"n":"Ionone beta","band":"cuore","assigned":true},{"n":"Raspberry ketone","band":"cuore","assigned":true},{"n":"Rosaphen","band":"cuore","assigned":true}]},{"id":"raffo1","name":"Raffo #1","date":"07/11","line":"Raffo","conc":"21,8","status":"base","from":null,"style":"Muschio pulito, rosa, frutti rossi e amarena, con pepe rosa in apertura.","method":"Raffo","approx":true,"bands":{"testa":5,"cuore":22.3,"fondo":72.6},"ings":[{"n":"Ambroxide","band":"fondo","assigned":true},{"n":"Benzyl acetate","band":"cuore","assigned":true},{"n":"Cassis","band":"cuore","assigned":true},{"n":"Damascone","band":"cuore","assigned":true},{"n":"Ethylene brassylate","band":"fondo","assigned":true},{"n":"Habanolide","band":"fondo","assigned":true},{"n":"Pink pepper","band":"testa","assigned":true},{"n":"Raspberry ketone","band":"cuore","assigned":true},{"n":"Rosaphen","band":"cuore","assigned":true}]},{"id":"sp3","name":"Sperimentale #3","date":"08/11","line":"Sperimentale","conc":"22","status":"base","from":"sp1","style":"Pulito unisex, tendente al maschile, con bacche e pelle.","method":null,"approx":true,"bands":{"testa":11.7,"cuore":40.9,"fondo":47.5},"ings":[{"n":"alpha Isomethyl ionone","band":"cuore","assigned":false},{"n":"Ambroxide","band":"fondo","assigned":false},{"n":"Benzyl salicylate","band":"fondo","assigned":false},{"n":"Bergamotto","band":"testa","assigned":false},{"n":"Cassis","band":"cuore","assigned":false},{"n":"Citronellol","band":"cuore","assigned":false},{"n":"Ethylene brassylate","band":"fondo","assigned":false},{"n":"Galaxolide","band":"fondo","assigned":false},{"n":"Habanolide","band":"fondo","assigned":false},{"n":"Hedione","band":"cuore","assigned":false},{"n":"IBQ","band":"fondo","assigned":false},{"n":"Ionone beta","band":"cuore","assigned":false},{"n":"Iso E Super","band":"fondo","assigned":false},{"n":"PEA","band":"cuore","assigned":false},{"n":"Pink pepper","band":"testa","assigned":false},{"n":"Raspberry ketone","band":"cuore","assigned":false}]},{"id":"pesca1","name":"Pesca legnosa #1","date":"08/11","line":"Pesca legnosa","conc":"18","status":"base","from":null,"style":"Pesca, legno e pulito: cremosa, leggera e ariosa.","method":null,"approx":true,"bands":{"testa":6.1,"cuore":19.2,"fondo":74.7},"ings":[{"n":"Aldehyde C14","band":"cuore","assigned":false},{"n":"Ambroxide","band":"fondo","assigned":false},{"n":"Bergamotto","band":"testa","assigned":false},{"n":"Cashmeran","band":"fondo","assigned":false},{"n":"Ethylene brassylate","band":"fondo","assigned":false},{"n":"Habanolide","band":"fondo","assigned":false},{"n":"Hedione","band":"cuore","assigned":false},{"n":"Iso E Super","band":"fondo","assigned":false},{"n":"Pink pepper","band":"testa","assigned":false}]}];
+const ENC={"salt": "GA3/YUhHp0CMt/hWZ4HHFA==", "iv": "9ZvsRwZts018UKd4", "it": 250000, "ct": "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"};
+const SENS={
+ "Bergamotto":"agrume fresco e luminoso, come un tè Earl Grey",
+ "Pink pepper":"pizzico di pepe frizzante, speziato e un po' agrumato",
+ "Hedione":"aria fresca di gelsomino, un pulito luminoso e trasparente",
+ "PEA":"petali di rosa freschi, acqua di rose delicata",
+ "alpha Isomethyl ionone":"cipria e violetta, polvere soffice (iris)",
+ "Citronellol":"rosa fresca e un po' limonata, petali con la rugiada",
+ "Ionone beta":"violetta legnosa con un tocco di lampone secco",
+ "Iso E Super":"legno morbido e vellutato, effetto pelle pulita",
+ "Ethylene brassylate":"muschio bianco, cotone e bucato pulito",
+ "Habanolide":"muschio liscio e leggermente metallico, lenzuola stirate",
+ "Benzyl salicylate":"fiori bianchi cremosi, dolce come una crema solare",
+ "Galaxolide":"muschio da bucato, sapone e detersivo",
+ "Ambroxide":"pelle calda e salata, ambra che resta addosso",
+ "Cashmeran":"lana morbida e cashmere, legno speziato e un po' terroso",
+ "Raspberry ketone":"lampone dolce, caramella alla frutta",
+ "Cassis":"ribes nero succoso e acidulo, con una nota verde",
+ "IBQ":"pelle grezza e camoscio, terra e verde (potentissimo)",
+ "Amyl salicylate":"erba tagliata e fiori bianchi, un che di solare e balsamico",
+ "Rosaphen":"rosa fresca e un po' metallica, petali appena colti",
+ "Aldehyde C14":"pesca matura e vellutata, cremosa",
+ "Benzyl acetate":"gelsomino fruttato, pera e banana dolce",
+ "Damascone":"rosa scura e frutti rossi, prugna e amarena"
+};
+const ICOL={
+ "Bergamotto":"#c9d65a","Pink pepper":"#f08a8a","Hedione":"#9fd8b8","PEA":"#e57fa0",
+ "alpha Isomethyl ionone":"#b8a3e0","Citronellol":"#f4b6c2","Ionone beta":"#8e6cc8",
+ "Iso E Super":"#c9a27a","Ethylene brassylate":"#ece4d4","Habanolide":"#a9b4bf",
+ "Benzyl salicylate":"#f3dca0","Galaxolide":"#8cc4ec","Ambroxide":"#e0a24a",
+ "Cashmeran":"#a88468","Raspberry ketone":"#e0457b","Cassis":"#9a5bb3","IBQ":"#9a6a48",
+ "Amyl salicylate":"#b5cf8f","Rosaphen":"#d97f9b","Aldehyde C14":"#f2a873","Benzyl acetate":"#efe08a","Damascone":"#b04a63"
+};
+const icol=n=>ICOL[norm(n)]||"#999";
+const ink=hex=>{const c=parseInt(hex.slice(1),16),r=c>>16,g=c>>8&255,b=c&255;return (0.299*r+0.587*g+0.114*b)>140?"#14110d":"#f3ebdd";};
+const BANDS=["testa","cuore","fondo"], BN={testa:"Testa",cuore:"Cuore",fondo:"Fondo"};
+const YEAR=2026, DENS=0.84, SIZES=[10,30,50,100];
+const fmt=(n,d=1)=>n.toLocaleString("it-IT",{minimumFractionDigits:d,maximumFractionDigits:d});
+const sgn=(n,d=1)=>(n>0?"+":n<0?"−":"")+fmt(Math.abs(n),d);
+const num=s=>parseFloat(String(s).replace(",","."));
+const $=id=>document.getElementById(id);
+const norm=n=>n.replace(/\s*\d+(,\d+)?%$/,"");
+const meta=id=>PUB.find(p=>p.id===id);
+const pre=p=>p.approx?"~":"";
+const cp="~";
+const badge=p=>p.status==="best"?`<span class="badge best">★ Migliore</span>`:p.status==="eval"?`<span class="badge eval">○ Da valutare</span>`:"";
+function ago(date){
+  const [d,m]=date.split("/").map(Number), t=new Date(YEAR,m-1,d), n=new Date(); n.setHours(0,0,0,0);
+  const g=Math.round((n-t)/864e5);
+  return g<=0?"fatto oggi":g===1?"1 giorno fa":`${g} giorni fa`;
+}
+
+/* ---------- stato ---------- */
+let MODE="amici", LAB=null;
+const isLab=()=>MODE==="lab"&&LAB;
+
+/* ---------- calcoli laboratorio ---------- */
+const rp=id=>LAB.PERFUMES.find(p=>p.id===id);
+function build(id,memo={}){
+  if(memo[id])return memo[id];
+  const p=rp(id); let parts=[], mass=0;
+  p.items.forEach(i=>{parts.push({n:i.n,a:i.g*i.pur,pur:i.pur,band:i.band,assigned:!!i.assigned,approx:!!i.approx});mass+=i.g;});
+  mass+=p.alcol;
+  if(p.base){const b=build(p.base.id,memo), f=p.base.g/b.mass;
+    b.parts.forEach(x=>parts.push({...x,a:x.a*f,inherited:true})); mass+=p.base.g;}
+  const act=parts.reduce((s,x)=>s+x.a,0);
+  return memo[id]={parts,mass,act};
+}
+function ingMap(id){
+  const b=build(id), m=new Map();
+  b.parts.forEach(x=>{const k=norm(x.n), e=m.get(k)||{pct:0,band:x.band,assigned:false};
+    e.pct+=x.a/b.act*100; e.assigned=e.assigned||x.assigned; m.set(k,e);});
+  return m;
+}
+function ingDetail(id,n){
+  const p=rp(id), direct=p.items.filter(i=>norm(i.n)===n);
+  const fromBase=p.base&&build(p.base.id).parts.some(x=>norm(x.n)===n)?meta(p.base.id).name:null;
+  const w=direct.map(i=>{const dil=(i.n.match(/(\d+(?:,\d+)?%)$/)||[])[1];
+    return `${i.approx?"~":""}${fmt(i.g,2)} g${i.drops?` (${i.drops} ${i.drops===1?"goccia":"gocce"})`:""}${dil?` di soluzione ${/^(8|1%|1,|11)/.test(dil)?"all'":"al "}${dil}`:""}`;}).join(" + ");
+  return {w,fromBase};
+}
+/* quanto serve per una bottiglia: ricetta appiattita in materie "come le usi" (pure o in soluzione) */
+function bottle(id,ml){
+  const b=build(id), m=new Map();
+  b.parts.forEach(x=>{const e=m.get(x.n)||{n:x.n,band:x.band,sol:0,act:0}; e.sol+=x.a/x.pur; e.act+=x.a; m.set(x.n,e);});
+  const target=ml*DENS, f=target/b.mass, rows=[...m.values()].map(e=>({...e,g:e.sol*f,ga:e.act*f}));
+  const solTot=rows.reduce((s,e)=>s+e.g,0);
+  rows.sort((a,c)=>BANDS.indexOf(a.band)-BANDS.indexOf(c.band)||c.g-a.g);
+  return {rows,alcol:target-solTot,target,pure:rows.reduce((s,e)=>s+e.ga,0)};
+}
+
+/* ---------- tabs ---------- */
+const TABS_AMICI=[["all","Profumi"],["ver","Versioni"]];
+const TABS_LAB=[["all","Profumi"],["cmp","Confronto"],["ver","Versioni"],["fb","Feedback"],["dil","Diluizioni"]];
+let TAB="all";
+function renderTabs(){
+  const t=isLab()?TABS_LAB:TABS_AMICI;
+  if(!t.some(x=>x[0]===TAB)) TAB="all";
+  $("tabs").innerHTML=t.map(([k,l])=>`<button role="tab" data-t="${k}" aria-selected="${k===TAB}">${l}</button>`).join("");
+  ["all","cmp","ver","fb","dil"].forEach(k=>$("p-"+k).hidden=k!==TAB);
+}
+function showTab(t){TAB=t; renderTabs();}
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b)showTab(b.dataset.t);});
+
+/* ---------- forme ---------- */
+const TAU=Math.PI*2;
+function arc(cx,cy,r0,r1,a0,a1){
+  if(a1-a0>=TAU-1e-6) return arc(cx,cy,r0,r1,a0,a0+Math.PI)+arc(cx,cy,r0,r1,a0+Math.PI,a1);
+  const P=(r,a)=>[(cx+r*Math.sin(a)).toFixed(2),(cy-r*Math.cos(a)).toFixed(2)];
+  const L=a1-a0>Math.PI?1:0,[x0,y0]=P(r1,a0),[x1,y1]=P(r1,a1),[x2,y2]=P(r0,a1),[x3,y3]=P(r0,a0);
+  return `M${x0},${y0}A${r1},${r1} 0 ${L} 1 ${x1},${y1}L${x2},${y2}A${r0},${r0} 0 ${L} 0 ${x3},${y3}Z`;
+}
+function miniDonut(p){
+  let a=0,h=`<svg viewBox="0 0 54 54" aria-hidden="true">`;
+  BANDS.forEach(k=>{const w=p.bands[k]/100*TAU; if(w>0) h+=`<path d="${arc(27,27,15,25,a,a+w)}" fill="var(--${k})" stroke="var(--surface)" stroke-width="1.5"/>`; a+=w;});
+  return h+`</svg>`;
+}
+function stackHTML(p){
+  return `<div class="stack">`+BANDS.filter(k=>p.bands[k]>0).map(k=>`<div class="seg ${k}" style="flex:${p.bands[k]} 1 0">${p.bands[k]>=16?pre(p)+fmt(p.bands[k],0)+"%":""}</div>`).join("")+`</div>`;
+}
+
+/* ---------- tessere ---------- */
+function renderTiles(){
+  $("tiles").innerHTML=PUB.map((p,i)=>`<button class="tile ${p.status||""}" style="--i:${i}" data-open="${p.id}" aria-label="Apri ${p.name}">
+    ${p.status==="best"?'<span class="star" title="Migliore">★</span>':p.status==="eval"?'<span class="star" title="Da valutare">○</span>':""}
+    ${miniDonut(p)}<div><h3>${p.name}</h3><div class="m">${p.date} · ${ago(p.date)}</div></div></button>`).join("");
+}
+$("tiles").addEventListener("click",e=>{const t=e.target.closest("[data-open]"); if(t) openSheet(t.dataset.open);});
+
+/* ---------- ruota ---------- */
+let CUR=null, SEL=null, LASTFOCUS=null, WD=null, SIZE=30, CALC_OPEN=false;
+function wheelData(id){
+  const p=meta(id), segs=[], bands=[]; let a=0;
+  const lab=isLab(), m=lab?ingMap(id):null;
+  BANDS.forEach(k=>{
+    const a0=a, bw=p.bands[k]/100*TAU;
+    let list=lab?[...m].filter(([n,e])=>e.band===k).sort((x,y)=>y[1].pct-x[1].pct).map(([n,e])=>({n,pct:e.pct,assigned:e.assigned}))
+                :p.ings.filter(x=>x.band===k).map(x=>({n:x.n,pct:null,assigned:x.assigned}));
+    list.forEach((x,i)=>{const w=lab?x.pct/100*TAU:bw/list.length; segs.push({...x,k,a0:a,a1:a+w,alt:i%2}); a+=w;});
+    if(lab) a=a0+bw; /* evita derive di arrotondamento */
+    if(bw>0) bands.push({k,a0,a1:a0+bw,pct:p.bands[k]});
+  });
+  return {segs,bands};
+}
+function renderSheet(intro){
+  const p=meta(CUR), P=pre(p), cx=165, cy=165, lab=isLab(); WD=wheelData(CUR); const {segs,bands}=WD;
+  let svg=`<svg class="wheel${intro?" intro":""}" viewBox="0 0 330 330" role="img" aria-label="Composizione di ${p.name}"><g class="gb">`;
+  bands.forEach(b=>{const mid=(b.a0+b.a1)/2; svg+=`<path d="${arc(cx,cy,62,96,b.a0,b.a1)}" fill="var(--${b.k})" data-b="${b.k}" style="${b.a1-b.a0>=TAU-1e-6?"stroke-width:0;":""}--tx:${(4*Math.sin(mid)).toFixed(2)}px;--ty:${(-4*Math.cos(mid)).toFixed(2)}px"><title>${BN[b.k]} ${P}${fmt(b.pct)}%</title></path>`;});
+  svg+=`</g><g class="gs">`;
+  segs.forEach(s=>{const mid=(s.a0+s.a1)/2;
+    svg+=`<path d="${arc(cx,cy,100,158,s.a0,s.a1)}" fill="${icol(s.n)}" data-i="${s.n}" style="--tx:${(7*Math.sin(mid)).toFixed(2)}px;--ty:${(-7*Math.cos(mid)).toFixed(2)}px"><title>${s.n}${lab?" "+P+fmt(s.pct)+"%":""}</title></path>`;});
+  svg+=`</g><g class="gl">`;
+  if(lab) segs.forEach(s=>{const mid=(s.a0+s.a1)/2; if(s.a1-s.a0>0.32) svg+=`<text class="lbl" style="fill:${ink(icol(s.n))}" x="${cx+129*Math.sin(mid)}" y="${cy-129*Math.cos(mid)+4}" text-anchor="middle">${fmt(s.pct,0)}%</text>`;});
+  svg+=`</g><g class="ctr"><text class="ctr1" x="${cx}" y="${cy+6}" text-anchor="middle"></text><text class="ctr2" x="${cx}" y="${cy+26}" text-anchor="middle"></text></g></svg>`;
+  const i=PUB.indexOf(p);
+  $("panel").innerHTML=`<div class="sh-top"><div><h2 id="sh-title">${p.name}</h2><div class="m">fatto il ${p.date} · ${ago(p.date)} ${badge(p)}</div></div>
+    <div class="sh-nav"><button class="icb" data-nav="-1" aria-label="Profumo precedente" ${i===0?"disabled":""}>‹</button><button class="icb" data-nav="1" aria-label="Profumo successivo" ${i===PUB.length-1?"disabled":""}>›</button><button class="icb" data-close aria-label="Chiudi">✕</button></div></div>
+    ${p.style?`<p class="style">${p.style}</p>`:""}
+    ${p.method?`<p class="method"><b>Su misura</b> · ${p.method} ha annusato ogni ingrediente su striscia e ha scelto i suoi preferiti: la formula usa solo quelli.</p>`:""}
+    ${lab&&rp(p.id).todo?`<p class="todo">⏳ ${rp(p.id).todo}</p>`:""}
+    ${lab?notesBlock(p):""}
+    ${svg}<div class="bandsum">${BANDS.map(k=>{const b=bands.find(x=>x.k===k);return `<button data-b="${k}" aria-pressed="false" ${b?"":"disabled"}><i class="dot" style="background:var(--${k})"></i>${BN[k]}<b>${b?P+fmt(b.pct,0)+"%":"—"}</b></button>`;}).join("")}</div>
+    <div class="info" aria-live="polite"></div>
+    ${lab?`<details class="calc" ${CALC_OPEN?"open":""}><summary>Quanto serve per una bottiglia</summary><div id="calcbody"></div></details>`:""}
+    <div class="sh-foot"><button class="back" data-reset hidden>← Tutta la ruota</button>${lab&&vers(p.line).length>1?`<button class="go" data-fam="${p.line}" style="margin-left:auto">Confronta versioni →</button>`:""}</div>`;
+  if(lab) renderCalc();
+  applySel(false);
+}
+function notesBlock(p){
+  const r=rp(p.id), it=[];
+  if(p.method) it.push([`Scelte di ${p.method}`,LAB.PICKS[p.method]||"—"]);
+  if(r.notes) it.push([`Mie note (${p.date})`,r.notes]);
+  (r.later||[]).forEach(x=>it.push([`Nota del ${x.date}`,x.t]));
+  if(r.story) it.push([p.method?"Storia":"Note",r.story]);
+  if(r.analysis) it.push(["Analisi",r.analysis]);
+  if(r.plan) it.push(["Prossimo passo",r.plan]);
+  if(!it.length) return "";
+  return `<details class="calc story"><summary>Note e piani</summary><div class="stb">${it.map(([a,b])=>`<div><span>${a}</span>${b}</div>`).join("")}</div></details>`;
+}
+function renderCalc(){
+  const r=bottle(CUR,SIZE), P=pre(meta(CUR));
+  const g=v=>v<0.01?"&lt;0,01 g":`${P}${fmt(v,2)} g`;
+  $("calcbody").innerHTML=`<div class="sizes" role="group" aria-label="Formato">${SIZES.map(s=>`<button data-size="${s}" aria-pressed="${s===SIZE}">${s} ml</button>`).join("")}</div>
+   <table class="ctab"><tbody>${r.rows.map(e=>`<tr><td><i class="dot" style="background:${icol(e.n)}"></i>${e.n}</td><td class="r">${g(e.g)}</td></tr>`).join("")}
+   <tr class="alc"><td>Alcol 95°</td><td class="r">${P}${fmt(r.alcol,2)} g</td></tr>
+   <tr class="tot"><td>Totale</td><td class="r">${P}${fmt(r.target,1)} g</td></tr></tbody></table>
+   <p class="cnote">Stima con 1 ml ≈ ${fmt(DENS,2)} g. Le materie in soluzione (es. 50%, 1%) sono in grammi di soluzione, come le pesi. Stessa concentrazione della formula (${cp}${meta(CUR).conc}%).</p>`;
+}
+function retrigger(el,c){el.classList.remove(c); void el.getBoundingClientRect(); el.classList.add(c);}
+function applySel(anim=true){
+  const p=meta(CUR), P=pre(p), lab=isLab(), {segs,bands}=WD, pan=$("panel");
+  const selI=SEL&&SEL.t==="i"?SEL.n:null, selB=SEL&&SEL.t==="b"?SEL.k:null;
+  const selK=selI?segs.find(x=>x.n===selI).k:selB;
+  pan.querySelectorAll(".gs path").forEach(el=>{const n=el.getAttribute("data-i"), s=segs.find(x=>x.n===n);
+    el.classList.toggle("dim",!!SEL&&(selI?n!==selI:s.k!==selB)); el.classList.toggle("sel",n===selI);
+    if(n===selI) el.parentNode.appendChild(el);});
+  pan.querySelectorAll(".gb path").forEach(el=>{const k=el.getAttribute("data-b");
+    el.classList.toggle("dim",!!SEL&&k!==selK); el.classList.toggle("sel",k===selB); if(k===selB) el.parentNode.appendChild(el);});
+  pan.querySelectorAll(".bandsum [data-b]").forEach(el=>el.setAttribute("aria-pressed",el.getAttribute("data-b")===selB));
+  pan.querySelector("[data-reset]").hidden=!SEL;
+  let c1=`${cp}${p.conc}%`, c2="concentrazione";
+  if(selI){const s=segs.find(x=>x.n===selI);
+    if(lab){c1=`${P}${fmt(s.pct)}%`; c2=selI.length>18?selI.slice(0,17)+"…":selI;} else {c1=BN[s.k]; c2=selI.length>22?selI.slice(0,21)+"…":selI;}}
+  if(selB){c1=`${P}${fmt(bands.find(x=>x.k===selB).pct)}%`; c2=BN[selB].toLowerCase();}
+  pan.querySelector(".ctr1").textContent=c1; pan.querySelector(".ctr2").textContent=c2;
+  let info;
+  if(selI){
+    const s=segs.find(x=>x.n===selI);
+    info=`<h4><i class="dot" style="background:${icol(selI)}"></i>${selI}</h4>`;
+    if(lab){const d=ingDetail(CUR,selI);
+      info+=`<div class="big">${P}${fmt(s.pct)}%<small>del concentrato</small></div>
+      <dl>${SENS[selI]?`<dt>Ricorda</dt><dd>${SENS[selI]}</dd>`:""}<dt>Fascia</dt><dd>${BN[s.k]}${s.assigned?" (assegnata da me)":""}</dd>
+      ${d.w?`<dt>Pesato</dt><dd>${d.w}</dd>`:""}${d.fromBase?`<dt>Arriva da</dt><dd>${d.fromBase} (base)</dd>`:""}</dl>`;}
+    else info+=`<dl>${SENS[selI]?`<dt>Ricorda</dt><dd>${SENS[selI]}</dd>`:""}<dt>Fascia</dt><dd>${BN[s.k]}</dd></dl>`;
+  }else if(selB){
+    const list=segs.filter(x=>x.k===selB);
+    info=`<h4><i class="dot" style="background:var(--${selB})"></i>${BN[selB]} · ${P}${fmt(bands.find(x=>x.k===selB).pct)}%</h4>
+      <div class="chipl">${list.map((x,j)=>`<button data-i="${x.n}" style="--i:${j}"><i class="dot" style="background:${icol(x.n)}"></i>${x.n}${lab?` <b>${P}${fmt(x.pct)}%</b>`:""}</button>`).join("")}</div>`;
+  }else info=`<p class="hint2">Tocca uno spicchio: anello interno = testa, cuore, fondo; anello esterno = ingredienti.</p>`;
+  const inf=pan.querySelector(".info"); inf.innerHTML=info;
+  if(anim){retrigger(inf,"swap"); retrigger(pan.querySelector(".ctr"),"swap");}
+}
+function openSheet(id){CUR=id; SEL=null; LASTFOCUS=document.activeElement; $("sheet").classList.remove("closing"); renderSheet(true); $("sheet").hidden=false; document.body.style.overflow="hidden"; $("panel").querySelector("[data-close]").focus();}
+function closeSheet(){const sh=$("sheet"); if(sh.hidden||sh.classList.contains("closing")) return;
+  const fin=()=>{sh.hidden=true; sh.classList.remove("closing"); document.body.style.overflow=""; if(LASTFOCUS&&LASTFOCUS.isConnected) LASTFOCUS.focus();};
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return fin();
+  sh.classList.add("closing"); setTimeout(fin,180);}
+function step(d){const i=PUB.indexOf(meta(CUR))+d; if(PUB[i]){CUR=PUB[i].id; SEL=null; renderSheet(true);}}
+$("sheet").addEventListener("click",e=>{
+  const t=e.target;
+  if(t.closest("[data-close]")) return closeSheet();
+  const nav=t.closest("[data-nav]"); if(nav) return step(+nav.dataset.nav);
+  if(t.closest("[data-reset]")){SEL=null; return applySel();}
+  const sz=t.closest("[data-size]"); if(sz){SIZE=+sz.dataset.size; return renderCalc();}
+  const fam=t.closest("[data-fam]"); if(fam){closeSheet(); FAM=fam.dataset.fam; const me=meta(CUR); PB=me.from?me.id:(pairs(FAM).find(x=>x[0]===me.id)||[])[1]||null; renderFam(); showTab("cmp"); window.scrollTo({top:0,behavior:"smooth"}); return;}
+  const ii=t.closest("[data-i]"); if(ii){const n=ii.getAttribute("data-i"); SEL=SEL&&SEL.t==="i"&&SEL.n===n?null:{t:"i",n}; return applySel();}
+  const bb=t.closest("[data-b]"); if(bb){const k=bb.getAttribute("data-b"); SEL=SEL&&SEL.t==="b"&&SEL.k===k?null:{t:"b",k}; return applySel();}
+});
+$("sheet").addEventListener("toggle",e=>{if(e.target.classList&&e.target.classList.contains("calc")) CALC_OPEN=e.target.open;},true);
+document.addEventListener("keydown",e=>{
+  if(!$("lock").hidden){ if(e.key==="Escape") closeLock(); return; }
+  if($("sheet").hidden) return;
+  if(e.key==="Escape") closeSheet();
+  if(e.key==="ArrowRight") step(1);
+  if(e.key==="ArrowLeft") step(-1);
+});
+
+/* ---------- versioni ---------- */
+const LINES=[...new Set(PUB.map(p=>p.line))];
+const vers=l=>PUB.filter(p=>p.line===l);
+const CLINES=()=>LINES.filter(l=>vers(l).length>1);
+function renderTimeline(){
+  const key=d=>{const [g,m]=d.split("/").map(Number);return m*100+g;};
+  const DATES=[...new Set(PUB.map(p=>p.date))].sort((a,b)=>key(a)-key(b));
+  const COL=Object.fromEntries(DATES.map((d,i)=>[d,i+1])), GC=`--cols:${DATES.length}`;
+  let h=`<div class="tl-dates" style="${GC}">${DATES.map(d=>`<div>${d}</div>`).join("")}</div>`;
+  LINES.forEach(ln=>{
+    const ids=vers(ln);
+    h+=`<div class="tl-lane"><div class="lane-name">${meta(ids[0].id).method?"Su misura · "+ln:ln}</div><div class="tl-row" style="${GC}">`;
+    ids.forEach((p,i)=>{
+      const nx=ids[i+1], link=nx&&nx.from===p.id&&COL[nx.date]===COL[p.date]+1?" link":"", st=p.status==="best"?" best":p.status==="eval"?" eval":"";
+      const dl=isLab()&&LAB.DELTA[p.id];
+      h+=`<button class="node${link}${st}" data-go="${p.id}" style="grid-column:${COL[p.date]}"><h3>${p.name}</h3><div class="meta">${p.date} · ${ago(p.date)}</div>${p.from&&!(i>0&&ids[i-1].id===p.from&&COL[ids[i-1].date]===COL[p.date]-1)?`<div class="from">↰ da ${meta(p.from).name}</div>`:""}${dl?`<div class="delta">${dl}</div>`:""}${badge(p)}</button>`;
+    });
+    h+=`</div></div>`;
+  });
+  $("timeline").innerHTML=h;
+}
+$("timeline").addEventListener("click",e=>{const n=e.target.closest("[data-go]"); if(n) openSheet(n.dataset.go);});
+
+/* ---------- confronto (laboratorio) ---------- */
+let FAM="Sperimentale", PB=null, SHOWALL=false;
+const pairs=l=>vers(l).filter(p=>p.from).map(p=>[p.from,p.id]);
+const shortN=p=>p.name.replace(p.line,"").trim()||p.name; const OPEN=new Set();
+function delta(a,b,d=1){const x=b-a; if(Math.abs(x)<0.05) return `<span class="d eq">=</span>`;
+  return `<span class="d ${x>0?"up":"dn"}">${x>0?"▲":"▼"} ${sgn(x,d)}</span>`;}
+function renderFam(){
+  if(!isLab()) return;
+  $("fam").style.gridTemplateColumns=`repeat(${CLINES().length},1fr)`;
+  $("fam").innerHTML=CLINES().map(l=>`<button data-f="${l}" aria-pressed="${l===FAM}">${l}<small>${pairs(l).map(([a,b])=>shortN(meta(a))+" → "+shortN(meta(b))).join(" · ")}</small></button>`).join("");
+  const PR=pairs(FAM); if(!PR.some(x=>x[1]===PB)) PB=PR[0][1];
+  const [A,B]=PR.find(x=>x[1]===PB), pa=meta(A), pb=meta(B), Pa=pre(pa), Pb=pre(pb);
+  const card=(p,t)=>`<div class="vc ${p.status==="best"?"best":p.status==="eval"?"eval":""}"><div class="t">${t}</div><h3>${p.name}</h3><div class="m">${p.date} · ${cp}${p.conc}%</div>${badge(p)}</div>`;
+  let h=PR.length>1?`<div class="pairs">${PR.map(([a,b])=>`<button data-pb="${b}" aria-pressed="${b===PB}">${shortN(meta(a))} → ${shortN(meta(b))}</button>`).join("")}</div>`:"";
+  h+=`<div class="chg"><b>Cosa cambia:</b> ${LAB.DELTA[B]||""}</div>`;
+  h+=`<div class="hd cgrid"><div class="n"></div><div class="a">${card(pa,"A · PRIMA")}</div><div class="b">${card(pb,"B · DOPO")}</div><div class="d">B − A</div></div><div class="cbody">`;
+  let RI=0;
+  const row=(lab,a,b,d="",cls="",n="")=>`<div class="r cgrid ${cls}" style="--i:${RI++}"${n?` data-n="${n}"`:""}><div class="n">${lab}</div><div class="a">${a}</div><div class="b">${b}</div><div class="d">${d}</div></div>`;
+  h+=row("Concentrazione",`<span class="val">${cp}${pa.conc}%</span>`,`<span class="val">${cp}${pb.conc}%</span>`,delta(num(pa.conc),num(pb.conc)));
+  h+=row(`Composizione<span class="lg2"><span><i style="background:var(--testa)"></i>testa</span><span><i style="background:var(--cuore)"></i>cuore</span><span><i style="background:var(--fondo)"></i>fondo</span></span>`,stackHTML(pa),stackHTML(pb));
+  const ma=ingMap(A), mb=ingMap(B);
+  const info=[...new Set([...ma.keys(),...mb.keys()])].map(n=>{const ea=ma.get(n),eb=mb.get(n),k=(ea||eb).band,diff=ea&&eb?eb.pct-ea.pct:null;
+    return {n,ea,eb,k,diff,changed:!(ea&&eb)||Math.abs(diff)>=1.5,mx:Math.max(ea?ea.pct:0,eb?eb.pct:0),assigned:(ea&&ea.assigned)||(eb&&eb.assigned)};});
+  const shown=info.filter(x=>SHOWALL||x.changed).sort((x,y)=>(y.changed-x.changed)||(Math.abs(y.diff??99)-Math.abs(x.diff??99))||y.mx-x.mx);
+  h+=`<div class="sec">${SHOWALL?"Tutti gli ingredienti":"Ingredienti che cambiano"}</div><div class="hintrow">Tocca un ingrediente per vedere cosa ricorda.</div>`;
+  if(!shown.length) h+=`<div class="r muted">Nessuna differenza rilevante.</div>`;
+  shown.forEach(x=>{
+    const cell=(e,P)=>e?`<span class="val">${P}${fmt(e.pct)}%</span><i class="mb" style="width:${Math.min(100,e.pct*2.2)}%;background:${icol(x.n)}"></i>`:'<span class="muted">—</span>';
+    const d=x.ea&&x.eb?delta(x.ea.pct,x.eb.pct):x.eb?`<span class="tagn new">nuovo</span>`:`<span class="tagn gone">tolto</span>`;
+    const lab=`<span class="nm"><i class="dot" style="background:${icol(x.n)}"></i>${x.n}${x.assigned?" †":""}</span>`+(SENS[x.n]?`<small class="sn">${SENS[x.n]}</small>`:"");
+    h+=row(lab,cell(x.ea,Pa),cell(x.eb,Pb),d,"ing"+(OPEN.has(x.n)?" open":""),x.n);
+  });
+  const hidden=info.length-info.filter(x=>x.changed).length;
+  if(hidden>0||SHOWALL) h+=`<button class="tgl" id="tgl">${SHOWALL?"Mostra solo le differenze":`Mostra tutti gli ingredienti (+${hidden})`}</button>`;
+  h+=`<details><summary>Le mie note</summary><div class="nb"><div><b class="muted" style="font-size:11px">A</b><br>${rp(A).notes}</div><div><b class="muted" style="font-size:11px">B</b><br>${rp(B).notes}</div></div></details></div>`;
+  $("cmpout").innerHTML=h;
+}
+$("fam").addEventListener("click",e=>{const b=e.target.closest("[data-f]"); if(b){FAM=b.dataset.f; renderFam();}});
+$("cmpout").addEventListener("click",e=>{
+  const pp=e.target.closest("[data-pb]"); if(pp){PB=pp.dataset.pb; return renderFam();}
+  if(e.target.closest("#tgl")){SHOWALL=!SHOWALL; return renderFam();}
+  const r=e.target.closest(".r.ing"); if(!r) return;
+  const n=r.dataset.n; if(OPEN.has(n)) OPEN.delete(n); else OPEN.add(n); r.classList.toggle("open");
+});
+
+/* ---------- feedback e diluizioni (laboratorio) ---------- */
+function renderLabTables(){
+  if(!isLab()){$("fbt").innerHTML=""; $("dilt").innerHTML=""; return;}
+  const {FEEDBACK,PEOPLE,DIL}=LAB, IC={pos:"+",neg:"−",neu:"~"}, LB={pos:"positivo",neg:"negativo",neu:"dubbioso"};
+  let ft=`<thead><tr><th>Profumo</th>${PEOPLE.map(n=>`<th>${n}</th>`).join("")}<th>Mie note</th></tr></thead><tbody>`;
+  PUB.forEach(p=>{const f=FEEDBACK[p.id], c={pos:0,neg:0,neu:0}; if(f) Object.values(f).forEach(x=>c[x.t]++);
+    ft+=`<tr><td class="pn2">${p.name}<small>${p.date}</small>${f?`<div class="tally"><span class="p">${c.pos} +</span><span class="n">${c.neg} −</span><span class="u">${c.neu} ~</span></div>`:""}</td>`;
+    if(!f) ft+=`<td colspan="${PEOPLE.length}" class="muted" data-l="Altri"><span>Non ancora fatto provare</span></td>`;
+    else PEOPLE.forEach(n=>{const x=f[n]; ft+=x?`<td data-l="${n}"><div class="fb ${x.t}"><span class="ic" aria-label="${LB[x.t]}">${IC[x.t]}</span><span class="ink2">${x.x}</span></div></td>`:`<td class="muted skip">—</td>`;});
+    ft+=`<td class="ink2" data-l="Io"><span>${rp(p.id).notes}</span></td></tr>`;});
+  $("fbt").innerHTML=ft+"</tbody>";
+  const tried=PUB.filter(p=>FEEDBACK[p.id]).map(p=>p.name);
+  $("fbhint").textContent=`Fatti provare finora: ${tried.join(", ")}.`;
+  $("dilt").innerHTML=`<thead><tr><th>Sostanza</th><th>Diluizione</th><th>Data</th><th>Quantità</th><th>Stato</th></tr></thead><tbody>`+
+    DIL.map(d=>`<tr><td class="dn"><b>${d.n}</b></td><td data-l="Diluiz."><span>${d.pct}</span></td><td class="muted" data-l="Data"><span>${d.date}</span></td><td class="ink2" data-l="Quantità"><span>${d.q}</span></td><td data-l="Stato"><span>${d.st?`<span class="tag${d.warn?" warn":""}">${d.st}</span>`:'<span class="muted">—</span>'}</span></td></tr>`).join("")+"</tbody>";
+}
+
+/* ---------- note ---------- */
+function renderNotes(){
+  $("notes").innerHTML=isLab()
+  ?`<div><b>~</b> = valore stimato (concentrazioni approssimate, quantità a gocce). Pesate in grammi, diluente alcol etilico 95°.</div>
+    <div>Le percentuali sono sul concentrato: solo materie attive, alcol escluso, diluizioni contate per il loro contenuto di attivo (Galaxolide 50% = metà del peso).</div>
+    <div>† = fascia assegnata da me con classificazione olfattiva standard; nelle tue schede solo Sperimentale #1 ha le fasce dichiarate.</div>
+    <div>Bottiglia: stima con 1 ml ≈ ${fmt(DENS,2)} g; per più precisione pesa 10 ml del tuo alcol.</div>
+    <div>Le descrizioni degli ingredienti sono indicative e soggettive.</div>`
+  :`<div>Ogni ruota mostra testa, cuore e fondo (anello interno) e gli ingredienti (anello esterno). Gli spicchi degli ingredienti indicano solo quali ci sono, non le quantità.</div>
+    <div><b>~</b> = valore stimato. Le descrizioni degli ingredienti sono indicative e soggettive.</div>`;
+}
+
+/* ---------- laboratorio: sblocco ---------- */
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function unlock(pw){
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:b64(ENC.salt),iterations:ENC.it,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(ENC.iv)},key,b64(ENC.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+function setMode(m){MODE=m; renderAll(); if(!$("sheet").hidden) renderSheet(false);}
+function renderAll(){
+  $("lockbtn").innerHTML=isLab()?`<span aria-hidden="true">🔓</span> Esci dal lab`:`<span aria-hidden="true">🔒</span> Laboratorio`;
+  $("lockbtn").classList.toggle("on",isLab());
+  document.body.classList.toggle("lab",!!isLab());
+  renderTabs(); renderTiles(); renderTimeline(); renderFam(); renderLabTables(); renderNotes();
+}
+function openLock(){$("lock").hidden=false; $("pwerr").hidden=true; $("pw").value=""; document.body.style.overflow="hidden"; setTimeout(()=>$("pw").focus(),30);}
+function closeLock(){$("lock").hidden=true; if($("sheet").hidden) document.body.style.overflow="";}
+$("lockbtn").addEventListener("click",()=>{
+  if(isLab()){LAB=null; try{sessionStorage.removeItem("labpw");}catch(e){} setMode("amici");}
+  else openLock();
+});
+$("lock").addEventListener("click",e=>{if(e.target.closest("[data-lclose]")) closeLock();});
+$("lockform").addEventListener("submit",async e=>{
+  e.preventDefault(); const pw=$("pw").value; $("enter").disabled=true; $("enter").textContent="Controllo…";
+  try{ LAB=await unlock(pw); try{sessionStorage.setItem("labpw",pw);}catch(_){}
+    closeLock(); setMode("lab");
+  }catch(err){ $("pwerr").hidden=false; retrigger($("lockform"),"shake"); $("pw").select(); }
+  finally{ $("enter").disabled=false; $("enter").textContent="Entra"; }
+});
+
+/* ---------- avvio ---------- */
+renderAll();
+(async()=>{ let pw=null; try{pw=sessionStorage.getItem("labpw");}catch(e){}
+  if(pw){ try{ LAB=await unlock(pw); setMode("lab"); }catch(e){ try{sessionStorage.removeItem("labpw");}catch(_){} } } })();
+</script>
+</body>
+</html>
