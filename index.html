@@ -385,6 +385,20 @@ header.top{display:flex;justify-content:space-between;align-items:flex-start;gap
 .about span{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:3px}
 .nchips{display:flex;flex-wrap:wrap;gap:5px}
 .nchips i{font-style:normal;font-size:12.5px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.labbox{margin-top:12px;border:1px solid rgba(240,179,65,.35);border-radius:16px;padding:12px;background:rgba(240,179,65,.04);display:grid;gap:8px}
+.labbox .calc,.labbox .story{margin-top:0}
+.lbh{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600}
+.ftab{margin:0 14px 4px;width:calc(100% - 28px)}
+.ftab th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:4px 2px;text-align:left}
+.ftab th.r{text-align:right}
+.ftab small{display:block;font-size:10.5px;color:var(--muted);font-weight:400}
+.ftab td small{display:inline;margin-left:4px}
+.ftab td.r small{display:block;margin:0}
+.labbox .cnote{padding:0 14px 10px}
+.tile .tt{font-size:11.5px;color:var(--amber);margin-top:4px;line-height:1.3}
+#fbt tr.grp td{background:var(--surface2);font:400 18px var(--serif);color:var(--amber);padding:8px 12px}
+.lt{color:var(--amber);font-weight:600;font-size:11.5px}
+@media (max-width:720px){.hd .d{visibility:hidden}#fbt tr.grp{padding:0}}
 .why{font-size:12.5px;color:var(--muted);margin:6px 0 0;line-height:1.45}
 .why b{color:var(--ink2);font-weight:600}
 .kindtag.k-profumo{color:var(--amber);border-color:rgba(240,179,65,.5)}
@@ -614,12 +628,12 @@ function renderTiles(){
 }
 function tileHTML(p,i){ return `<button class="tile ${p.status||""}" style="--i:${i}" data-open="${p.id}" aria-label="Apri ${p.name}">
     ${p.status==="best"?'<span class="star" title="Migliore">★</span>':p.status==="eval"?'<span class="star" title="Da valutare">○</span>':""}
-    ${miniDonut(p)}<div><h3>${p.name}</h3><div class="m">${p.date} · ${ago(p.date)}</div></div></button>`;
+    ${miniDonut(p)}<div><h3>${p.name}</h3><div class="m">${isLab()?`${p.date} · ${cp}${p.conc}%`:`${p.date} · ${ago(p.date)}`}</div>${isLab()&&rp(p.id).todo?`<div class="tt">⏳ ${rp(p.id).todo}</div>`:""}</div></button>`;
 }
 $("tiles").addEventListener("click",e=>{const t=e.target.closest("[data-open]"); if(t) openSheet(t.dataset.open);});
 
 /* ---------- ruota ---------- */
-let CUR=null, SEL=null, LASTFOCUS=null, WD=null, SIZE=30, CALC_OPEN=false;
+let CUR=null, SEL=null, LASTFOCUS=null, WD=null, SIZE=30, CALC_OPEN=false, FORM_OPEN=true;
 function wheelData(id){
   const p=meta(id), segs=[], bands=[]; let a=0;
   const lab=isLab(), m=lab?ingMap(id):null;
@@ -652,17 +666,30 @@ function renderSheet(intro){
     <div class="sh-nav"><button class="icb" data-nav="-1" aria-label="Profumo precedente" ${i===0?"disabled":""}>‹</button><button class="icb" data-nav="1" aria-label="Profumo successivo" ${i===PUB.length-1?"disabled":""}>›</button><button class="icb" data-close aria-label="Chiudi">✕</button></div></div>
     ${p.desc?`<p class="style">${p.desc.feel}</p><p class="stato">${p.desc.stato}</p>`:p.style?`<p class="style">${p.style}</p>`:""}
     ${lab&&rp(p.id).todo?`<p class="todo">⏳ ${rp(p.id).todo}</p>`:""}
-    ${lab?notesBlock(p):""}
     ${svg}<div class="bandsum">${BANDS.map(k=>{const b=bands.find(x=>x.k===k);return `<button data-b="${k}" aria-pressed="false" ${b?"":"disabled"}><i class="dot" style="background:var(--${k})"></i>${BN[k]}<b>${b?P+fmt(b.pct,0)+"%":"—"}</b></button>`;}).join("")}</div>
     <div class="info" aria-live="polite"></div>
     ${p.desc||p.why?`<div class="about">
       ${p.desc?`<div><span>L'idea</span>${p.desc.idea}</div><div><span>Note</span><div class="nchips">${p.desc.notes.map(n=>`<i>${n}</i>`).join("")}</div></div>`:""}
       ${p.why?`<div><span>Perché è ${p.tipo||(p.kind==="accordo"?"un accordo":p.kind==="semi"?"semi-completo":"completo")}</span>${p.why}</div>`:""}
     </div>`:""}
-    ${lab?`<details class="calc" ${CALC_OPEN?"open":""}><summary>Quanto serve per una bottiglia</summary><div id="calcbody"></div></details>`:""}
+    ${lab?`<div class="labbox"><div class="lbh">🔒 Laboratorio</div>
+      <details class="calc" ${FORM_OPEN?"open":""} data-k="form"><summary>Formula pesata</summary>${formulaTable(p)}</details>
+      ${notesBlock(p)}
+      <details class="calc" ${CALC_OPEN?"open":""} data-k="calc"><summary>Quanto serve per una bottiglia</summary><div id="calcbody"></div></details>
+    </div>`:""}
     <div class="sh-foot"><button class="back" data-reset hidden>← Tutta la ruota</button>${lab&&vers(p.line).length>1?`<button class="go" data-fam="${p.line}" style="margin-left:auto">Confronta versioni →</button>`:""}</div>`;
   if(lab) renderCalc();
   applySel(false);
+}
+function formulaTable(p){
+  const r=rp(p.id), b=build(p.id), P=pre(p), m=ingMap(p.id);
+  const rows=r.items.map(i=>{const n=norm(i.n), dil=(i.n.match(/(\d+(?:,\d+)?%)$/)||[])[1], own=i.g*i.pur/b.act*100;
+    return `<tr><td>${iconSVG(i.n,16)}${n}${dil?` <small>${dil}</small>`:""}</td><td class="r">${i.approx?"~":""}${fmt(i.g,2)} g${i.drops?`<small>${i.drops} gt</small>`:""}</td><td class="r muted">${P}${fmt(own)}%</td></tr>`;}).join("");
+  const base=r.base?`<tr class="alc"><td>↳ ${meta(r.base.id).name} (base)</td><td class="r">${fmt(r.base.g,2)} g</td><td class="r muted">${P}${fmt(100-r.items.reduce((s,i)=>s+i.g*i.pur,0)/b.act*100)}%</td></tr>`:"";
+  return `<table class="ctab ftab"><thead><tr><th>Materia</th><th class="r">Pesato</th><th class="r">% conc.</th></tr></thead><tbody>${rows}${base}
+   ${r.alcol?`<tr class="alc"><td>Alcol 95°</td><td class="r">${fmt(r.alcol,2)} g</td><td></td></tr>`:""}
+   <tr class="tot"><td>Totale</td><td class="r">${P}${fmt(b.mass,2)} g</td><td class="r">${cp}${p.conc}%</td></tr></tbody></table>
+   <p class="cnote">Materie pure ${P}${fmt(b.act,3)} g. % conc. = quota di attivo sul concentrato (le soluzioni contano per il loro attivo).</p>`;
 }
 function notesBlock(p){
   const r=rp(p.id), it=[];
@@ -734,7 +761,7 @@ $("sheet").addEventListener("click",e=>{
   const ii=t.closest("[data-i]"); if(ii){const n=ii.getAttribute("data-i"); SEL=SEL&&SEL.t==="i"&&SEL.n===n?null:{t:"i",n}; return applySel();}
   const bb=t.closest("[data-b]"); if(bb){const k=bb.getAttribute("data-b"); SEL=SEL&&SEL.t==="b"&&SEL.k===k?null:{t:"b",k}; return applySel();}
 });
-$("sheet").addEventListener("toggle",e=>{if(e.target.classList&&e.target.classList.contains("calc")) CALC_OPEN=e.target.open;},true);
+$("sheet").addEventListener("toggle",e=>{const k=e.target.dataset&&e.target.dataset.k; if(k==="calc") CALC_OPEN=e.target.open; if(k==="form") FORM_OPEN=e.target.open;},true);
 document.addEventListener("keydown",e=>{
   if(!$("lock").hidden){ if(e.key==="Escape") closeLock(); return; }
   if($("sheet").hidden) return;
@@ -816,11 +843,13 @@ function renderLabTables(){
   if(!isLab()){$("fbt").innerHTML=""; $("dilt").innerHTML=""; return;}
   const {FEEDBACK,PEOPLE,DIL}=LAB, IC={pos:"+",neg:"−",neu:"~"}, LB={pos:"positivo",neg:"negativo",neu:"dubbioso"};
   let ft=`<thead><tr><th>Profumo</th>${PEOPLE.map(n=>`<th>${n}</th>`).join("")}<th>Mie note</th></tr></thead><tbody>`;
-  PUB.forEach(p=>{const f=FEEDBACK[p.id], c={pos:0,neg:0,neu:0}; if(f) Object.values(f).forEach(x=>c[x.t]++);
+  KINDS.forEach(([k,t])=>{const L=PUB.filter(p=>p.kind===k); if(!L.length) return;
+  ft+=`<tr class="grp"><td colspan="${PEOPLE.length+2}">${t}</td></tr>`;
+  L.forEach(p=>{const f=FEEDBACK[p.id], c={pos:0,neg:0,neu:0}; if(f) Object.values(f).forEach(x=>c[x.t]++);
     ft+=`<tr><td class="pn2">${p.name}<small>${p.date}</small>${f?`<div class="tally"><span class="p">${c.pos} +</span><span class="n">${c.neg} −</span><span class="u">${c.neu} ~</span></div>`:""}</td>`;
     if(!f) ft+=`<td colspan="${PEOPLE.length}" class="muted" data-l="Altri"><span>Non ancora fatto provare</span></td>`;
     else PEOPLE.forEach(n=>{const x=f[n]; ft+=x?`<td data-l="${n}"><div class="fb ${x.t}"><span class="ic" aria-label="${LB[x.t]}">${IC[x.t]}</span><span class="ink2">${x.x}</span></div></td>`:`<td class="muted skip">—</td>`;});
-    ft+=`<td class="ink2" data-l="Io"><span>${rp(p.id).notes}</span></td></tr>`;});
+    const r=rp(p.id); ft+=`<td class="ink2" data-l="Io"><span>${r.notes}${(r.later||[]).map(x=>`<br><b class="lt">${x.date}</b> ${x.t}`).join("")}</span></td></tr>`;});});
   $("fbt").innerHTML=ft+"</tbody>";
   const tried=PUB.filter(p=>FEEDBACK[p.id]).map(p=>p.name);
   $("fbhint").textContent=`Fatti provare finora: ${tried.join(", ")}.`;
