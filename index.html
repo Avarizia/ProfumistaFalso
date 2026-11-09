@@ -369,6 +369,13 @@ header.top{display:flex;justify-content:space-between;align-items:flex-start;gap
 .cnote{font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.4}
 @media (max-width:720px){ .lockbtn{padding:7px 11px;font-size:12px} header.top h1{font-size:34px} }
 
+.ico{flex:none;vertical-align:-3px;margin-right:7px}
+.chipl .ico{margin-right:0}
+.sico{pointer-events:none}
+.bigico{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:14px}
+.bigico .ico{margin:0}
+.info h4{gap:10px}
+
 *{-webkit-tap-highlight-color:transparent}
 button,summary,.tile,.wheel,.node,.r.ing,.tabs,.fam,.bandsum,.chipl,.sizes,.pairs{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 
@@ -468,7 +475,33 @@ const ICOL={
  "Cashmeran":"#a88468","Raspberry ketone":"#e0457b","Cassis":"#9a5bb3","IBQ":"#9a6a48",
  "Amyl salicylate":"#b5cf8f","Rosaphen":"#d97f9b","Aldehyde C14":"#f2a873","Benzyl acetate":"#efe08a","Damascone":"#b04a63"
 };
+const PET=(n,rx,ry,cy)=>Array.from({length:n},(_,i)=>`<ellipse cx="12" cy="${cy}" rx="${rx}" ry="${ry}" transform="rotate(${i*360/n} 12 12)"/>`).join("");
+const IC={
+ citrus:`<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="6"/>${[0,60,120].map(a=>`<path d="M12 6v12" transform="rotate(${a} 12 12)"/>`).join("")}`,
+ pepper:`<circle cx="8" cy="9" r="3.2"/><circle cx="15.5" cy="8" r="3.2"/><circle cx="11.5" cy="15.5" r="3.2"/><circle cx="8" cy="9" r=".6"/><circle cx="15.5" cy="8" r=".6"/><circle cx="11.5" cy="15.5" r=".6"/>`,
+ jasmine:`${PET(5,2.6,4.6,6.6)}<circle cx="12" cy="12" r="1.6"/>`,
+ violet:`${PET(5,3,3.4,7.4)}<circle cx="12" cy="12" r="1.5"/>`,
+ iris:`<path d="M12 3c2.2 2.8 2.2 6.2 0 9c-2.2-2.8-2.2-6.2 0-9z"/><path d="M12 12c-2.8-1.6-6.4-.8-8 2.6c3 1.3 6 .2 8-2.6z"/><path d="M12 12c2.8-1.6 6.4-.8 8 2.6c-3 1.3-6 .2-8-2.6z"/><path d="M12 12v9"/>`,
+ rose:`<path d="M12 20.5c-4.7 0-8-3.3-8-7.8c0-3.8 2.6-6.9 5.4-8.2c1.5 1.2 3.7 1.2 5.2 0c2.8 1.3 5.4 4.4 5.4 8.2c0 4.5-3.3 7.8-8 7.8z"/><path d="M12 9.5c2 0 3.3 1.4 3.3 3.1s-1.5 3.2-3.5 3.2S8.6 14.4 8.6 12.8c0-1.2.9-2 2-2"/>`,
+ drop:`<path d="M12 3.2c3.6 4.8 6.3 8 6.3 11.2a6.3 6.3 0 0 1-12.6 0c0-3.2 2.7-6.4 6.3-11.2z"/><path d="M9.3 14.6c0 1.6 1.1 2.8 2.6 3"/>`,
+ wood:`<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5.4"/><circle cx="12" cy="12" r="2.3"/><path d="M12 3.5l1.3 4"/>`,
+ cotton:`<path d="M7 18a4 4 0 0 1-.6-8a5.6 5.6 0 0 1 10.8-1.3A4.7 4.7 0 0 1 17.3 18z"/><path d="M10 18v3M14 18v3"/>`,
+ linen:`<path d="M4 7.5h16v4.2H4z"/><path d="M4 11.7h16v4.2H4z"/><path d="M5.5 15.9h13V20h-13z"/><path d="M8 9.6h8"/>`,
+ sun:`<circle cx="12" cy="12" r="4"/>${Array.from({length:8},(_,i)=>`<path d="M12 2.8v2.6" transform="rotate(${i*45} 12 12)"/>`).join("")}`,
+ bubbles:`<circle cx="9.5" cy="13.5" r="5.5"/><circle cx="16.5" cy="7" r="3"/><circle cx="17.5" cy="15.5" r="2"/><path d="M7 11.5a3 3 0 0 1 2.4-1.6"/>`,
+ wool:`<circle cx="12" cy="12" r="8.5"/><path d="M5 9c4 0 8 2 10.5 9.5"/><path d="M8 4.5c3 1.5 6 4.6 7 11"/><path d="M4.3 13.5c3.6.2 6.8 2.3 8.2 6.7"/><path d="M19 17.5c1.5 1 2.6 2 3 3"/>`,
+ raspberry:`<path d="M12 7c4 0 6.5 3 6.5 6.5S15.5 21 12 21s-6.5-4-6.5-7.5S8 7 12 7z"/><circle cx="9.5" cy="11.5" r="1.6"/><circle cx="14.5" cy="11.5" r="1.6"/><circle cx="12" cy="14.6" r="1.6"/><circle cx="9.3" cy="17" r="1.4"/><circle cx="14.7" cy="17" r="1.4"/><path d="M12 7V3.5M12 5c-1.5-1.5-3.5-1.7-5-1M12 5c1.5-1.5 3.5-1.7 5-1"/>`,
+ berries:`<circle cx="8" cy="15" r="3.6"/><circle cx="15.5" cy="16" r="3.6"/><circle cx="12" cy="10" r="3.2"/><path d="M12 6.8V3.5c2-.5 4 0 5.5 1.5"/>`,
+ leather:`<path d="M6 4c2 1.2 4 1.2 6 0c2 1.2 4 1.2 6 0l-.9 5.2l2 4.6l-3 6.2c-2.6-1-5.6-1-8.2 0l-3-6.2l2-4.6z"/><path d="M8.6 8.2l.6 0M11.7 7.6h.6M14.8 8.2h.6M8.4 16.2h.6M11.7 16.6h.6M15 16.2h.6" stroke-width="2"/>`,
+ grass:`<path d="M6 20.5c.6-4.6-.4-8.6-2.6-11.6"/><path d="M10.5 20.5c-.2-6 1-10.4 4-14.4"/><path d="M15 20.5c.2-4 2-7 5.4-9"/><path d="M12.3 20.5c-1-3-2.8-5.3-5-6.5"/><path d="M3 20.5h18"/>`,
+ peach:`<path d="M12 7.6c-4.7-1.4-8.4 1.8-8.4 6.4c0 4.2 3.6 7 8.4 7s8.4-2.8 8.4-7c0-4.6-3.7-7.8-8.4-6.4z"/><path d="M12 7.6c-1.4 3.4-1.4 8.2.8 13.2"/><path d="M12 7.6c.6-2.6 2.6-4.3 6-4.3c-.8 2.9-3 4.3-6 4.3z"/>`,
+ pear:`<path d="M12 6.2c-1.6 0-2.6 1.4-2.6 3.4c0 2.3-4.1 3.5-4.1 7.5c0 2.6 2.9 4.5 6.7 4.5s6.7-1.9 6.7-4.5c0-4-4.1-5.2-4.1-7.5c0-2-1-3.4-2.6-3.4z"/><path d="M12 6.2V3.2"/><path d="M12 4.5c1-1.4 2.6-1.8 4.2-1.2c-.9 1.5-2.4 1.8-4.2 1.2z"/>`,
+ cherry:`<circle cx="7.5" cy="17" r="3.5"/><circle cx="16.5" cy="16" r="3.5"/><path d="M7.5 13.5C8.6 9 11 5.8 14.5 3.5"/><path d="M16.5 12.5c-.3-3.6-.9-6.6-2-9"/><path d="M14.5 3.5c1.8-.6 3.8.1 5 1.6c-1.8.6-3.6.1-5-1.6z"/>`
+};
+const IMAP={"Bergamotto":"citrus","Pink pepper":"pepper","Hedione":"jasmine","PEA":"rose","alpha Isomethyl ionone":"iris","Citronellol":"rose","Ionone beta":"violet","Iso E Super":"wood","Ethylene brassylate":"cotton","Habanolide":"linen","Benzyl salicylate":"sun","Galaxolide":"bubbles","Ambroxide":"drop","Cashmeran":"wool","Raspberry ketone":"raspberry","Cassis":"berries","IBQ":"leather","Amyl salicylate":"grass","Rosaphen":"rose","Aldehyde C14":"peach","Benzyl acetate":"pear","Damascone":"cherry"};
 const icol=n=>ICOL[norm(n)]||"#999";
+const iconSVG=(n,size,color)=>{const k=IMAP[norm(n)]; if(!k) return `<i class="dot" style="background:${icol(n)}"></i>`;
+  return `<svg class="ico" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color||icol(n)}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;};
 const ink=hex=>{const c=parseInt(hex.slice(1),16),r=c>>16,g=c>>8&255,b=c&255;return (0.299*r+0.587*g+0.114*b)>140?"#14110d":"#f3ebdd";};
 const BANDS=["testa","cuore","fondo"], BN={testa:"Testa",cuore:"Cuore",fondo:"Fondo"};
 const YEAR=2026, DENS=0.84, SIZES=[10,30,50,100];
@@ -587,7 +620,11 @@ function renderSheet(intro){
   segs.forEach(s=>{const mid=(s.a0+s.a1)/2;
     svg+=`<path d="${arc(cx,cy,100,158,s.a0,s.a1)}" fill="${icol(s.n)}" data-i="${s.n}" style="--tx:${(7*Math.sin(mid)).toFixed(2)}px;--ty:${(-7*Math.cos(mid)).toFixed(2)}px"><title>${s.n}${lab?" "+P+fmt(s.pct)+"%":""}</title></path>`;});
   svg+=`</g><g class="gl">`;
-  if(lab) segs.forEach(s=>{const mid=(s.a0+s.a1)/2; if(s.a1-s.a0>0.32) svg+=`<text class="lbl" style="fill:${ink(icol(s.n))}" x="${cx+129*Math.sin(mid)}" y="${cy-129*Math.cos(mid)+4}" text-anchor="middle">${fmt(s.pct,0)}%</text>`;});
+  segs.forEach(s=>{const mid=(s.a0+s.a1)/2, w=s.a1-s.a0, x=cx+129*Math.sin(mid), y=cy-129*Math.cos(mid), c=ink(icol(s.n)), k=IMAP[s.n];
+    if(lab){ if(w>0.42&&k) svg+=`<svg class="sico" x="${x-8}" y="${y-17}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg><text class="lbl" style="fill:${c}" x="${x}" y="${y+12}" text-anchor="middle">${fmt(s.pct,0)}%</text>`;
+             else if(w>0.32) svg+=`<text class="lbl" style="fill:${c}" x="${x}" y="${y+4}" text-anchor="middle">${fmt(s.pct,0)}%</text>`; }
+    else if(w>0.2&&k){const z=Math.min(30,Math.max(18,w*52)); svg+=`<svg class="sico" x="${x-z/2}" y="${y-z/2}" width="${z}" height="${z}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;}
+  });
   svg+=`</g><g class="ctr"><text class="ctr1" x="${cx}" y="${cy+6}" text-anchor="middle"></text><text class="ctr2" x="${cx}" y="${cy+26}" text-anchor="middle"></text></g></svg>`;
   const i=PUB.indexOf(p);
   $("panel").innerHTML=`<div class="sh-top"><div><h2 id="sh-title">${p.name}</h2><div class="m">fatto il ${p.date} · ${ago(p.date)} ${badge(p)}</div></div>
@@ -618,7 +655,7 @@ function renderCalc(){
   const r=bottle(CUR,SIZE), P=pre(meta(CUR));
   const g=v=>v<0.01?"&lt;0,01 g":`${P}${fmt(v,2)} g`;
   $("calcbody").innerHTML=`<div class="sizes" role="group" aria-label="Formato">${SIZES.map(s=>`<button data-size="${s}" aria-pressed="${s===SIZE}">${s} ml</button>`).join("")}</div>
-   <table class="ctab"><tbody>${r.rows.map(e=>`<tr><td><i class="dot" style="background:${icol(e.n)}"></i>${e.n}</td><td class="r">${g(e.g)}</td></tr>`).join("")}
+   <table class="ctab"><tbody>${r.rows.map(e=>`<tr><td>${iconSVG(e.n,16)}${e.n}</td><td class="r">${g(e.g)}</td></tr>`).join("")}
    <tr class="alc"><td>Alcol 95°</td><td class="r">${P}${fmt(r.alcol,2)} g</td></tr>
    <tr class="tot"><td>Totale</td><td class="r">${P}${fmt(r.target,1)} g</td></tr></tbody></table>
    <p class="cnote">Stima con 1 ml ≈ ${fmt(DENS,2)} g. Le materie in soluzione (es. 50%, 1%) sono in grammi di soluzione, come le pesi. Stessa concentrazione della formula (${cp}${meta(CUR).conc}%).</p>`;
@@ -643,7 +680,7 @@ function applySel(anim=true){
   let info;
   if(selI){
     const s=segs.find(x=>x.n===selI);
-    info=`<h4><i class="dot" style="background:${icol(selI)}"></i>${selI}</h4>`;
+    info=`<h4><span class="bigico" style="background:${icol(selI)}">${iconSVG(selI,30,ink(icol(selI)))}</span>${selI}</h4>`;
     if(lab){const d=ingDetail(CUR,selI);
       info+=`<div class="big">${P}${fmt(s.pct)}%<small>del concentrato</small></div>
       <dl>${SENS[selI]?`<dt>Ricorda</dt><dd>${SENS[selI]}</dd>`:""}<dt>Fascia</dt><dd>${BN[s.k]}${s.assigned?" (assegnata da me)":""}</dd>
@@ -652,7 +689,7 @@ function applySel(anim=true){
   }else if(selB){
     const list=segs.filter(x=>x.k===selB);
     info=`<h4><i class="dot" style="background:var(--${selB})"></i>${BN[selB]} · ${P}${fmt(bands.find(x=>x.k===selB).pct)}%</h4>
-      <div class="chipl">${list.map((x,j)=>`<button data-i="${x.n}" style="--i:${j}"><i class="dot" style="background:${icol(x.n)}"></i>${x.n}${lab?` <b>${P}${fmt(x.pct)}%</b>`:""}</button>`).join("")}</div>`;
+      <div class="chipl">${list.map((x,j)=>`<button data-i="${x.n}" style="--i:${j}">${iconSVG(x.n,17)}${x.n}${lab?` <b>${P}${fmt(x.pct)}%</b>`:""}</button>`).join("")}</div>`;
   }else info=`<p class="hint2">Tocca uno spicchio: anello interno = testa, cuore, fondo; anello esterno = ingredienti.</p>`;
   const inf=pan.querySelector(".info"); inf.innerHTML=info;
   if(anim){retrigger(inf,"swap"); retrigger(pan.querySelector(".ctr"),"swap");}
@@ -734,7 +771,7 @@ function renderFam(){
   shown.forEach(x=>{
     const cell=(e,P)=>e?`<span class="val">${P}${fmt(e.pct)}%</span><i class="mb" style="width:${Math.min(100,e.pct*2.2)}%;background:${icol(x.n)}"></i>`:'<span class="muted">—</span>';
     const d=x.ea&&x.eb?delta(x.ea.pct,x.eb.pct):x.eb?`<span class="tagn new">nuovo</span>`:`<span class="tagn gone">tolto</span>`;
-    const lab=`<span class="nm"><i class="dot" style="background:${icol(x.n)}"></i>${x.n}${x.assigned?" †":""}</span>`+(SENS[x.n]?`<small class="sn">${SENS[x.n]}</small>`:"");
+    const lab=`<span class="nm">${iconSVG(x.n,18)}${x.n}${x.assigned?" †":""}</span>`+(SENS[x.n]?`<small class="sn">${SENS[x.n]}</small>`:"");
     h+=row(lab,cell(x.ea,Pa),cell(x.eb,Pb),d,"ing"+(OPEN.has(x.n)?" open":""),x.n);
   });
   const hidden=info.length-info.filter(x=>x.changed).length;
