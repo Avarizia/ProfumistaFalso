@@ -730,7 +730,7 @@ function notesBlock(p){
 }
 function pyramidHTML(p,segs,bands){
   const P=pre(p), lab=isLab(), W={testa:"62%",cuore:"81%",fondo:"100%"};
-  return `<div class="pyr">${BANDS.map(k=>{const b=bands.find(x=>x.k===k), L=segs.filter(s=>s.k===k);
+  return `<div class="pyr">${BANDS.filter(k=>segs.some(s=>s.k===k)).map(k=>{const b=bands.find(x=>x.k===k), L=segs.filter(s=>s.k===k);
     return `<div class="tier" style="--w:${W[k]}"><button class="th" data-b="${k}" ${b?"":"disabled"}><span>${BN[k]}</span></button>
       <div class="tchips">${L.length?L.map(s=>`<button class="pchip" data-i="${s.n}" data-pi="${s.n}"><span class="pic">${iconSVG(s.n,26)}</span><span class="pn">${nice(s.n)}</span></button>`).join(""):`<span class="none">nessuna nota di ${BN[k].toLowerCase()}</span>`}</div></div>`;}).join("")}</div>${p.desc?`<div class="pnotes"><span>Note</span><div class="nchips">${p.desc.notes.map(n=>`<i>${n}</i>`).join("")}</div></div>`:""}`;
 }
