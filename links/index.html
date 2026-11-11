@@ -69,20 +69,52 @@
   .fbody .card:last-child { border-bottom:0; }
   .folder[open] .fbody { animation:open .5s var(--ease); }
   @keyframes open { from { transform:translateY(-6px); } to { transform:none; } }
+  /* intro */
+  .intro { position:fixed; inset:0; z-index:50; display:grid; place-items:center; align-content:center; gap:18px; background:var(--ink); clip-path:inset(0 0 0 0); animation:curtain .9s cubic-bezier(.7,0,.2,1) 1.55s forwards; }
+  .intro svg { width:72px; height:72px; overflow:visible; }
+  .intro .flask { fill:none; stroke:var(--bone); stroke-width:1.1; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:60; stroke-dashoffset:60; animation:draw .9s cubic-bezier(.65,0,.35,1) .1s forwards; }
+  .intro .liquid { fill:var(--crimson); clip-path:inset(100% 0 0 0); animation:fill .7s cubic-bezier(.16,1,.3,1) .8s forwards; }
+  .intro p { font-family:"JetBrains Mono", monospace; font-size:.68rem; letter-spacing:.32em; text-transform:uppercase; color:var(--muted); clip-path:inset(0 100% 0 0); animation:type .6s steps(16) .7s forwards; }
+  @keyframes draw { to { stroke-dashoffset:0; } }
+  @keyframes fill { to { clip-path:inset(0 0 0 0); } }
+  @keyframes type { to { clip-path:inset(0 0 0 0); } }
+  @keyframes curtain { to { clip-path:inset(0 0 100% 0); visibility:hidden; } }
+  html.seen .intro { display:none; }
+  /* page entrance, timed after the curtain */
+  .mark { animation:pop .9s var(--ease) 1.9s both; }
+  @keyframes pop { from { transform:scale(.6) rotate(-12deg); } to { transform:none; } }
+  h1 .w { display:inline-block; overflow:hidden; vertical-align:bottom; padding-bottom:.06em; }
+  h1 .w span { display:inline-block; animation:wordup 1s var(--ease) both; }
+  h1 .w:nth-child(1) span { animation-delay:2s; }
+  h1 .w:nth-child(2) span { animation-delay:2.12s; }
+  @keyframes wordup { from { transform:translateY(105%); } to { transform:none; } }
+  .sub { animation:rise .9s var(--ease) 2.25s both; }
+  .solo.rise { animation-delay:2.35s !important; }
+  .folders .folder.rise { animation-delay:2.45s !important; }
+  .solo, .folders > .folder { position:relative; }
+  .solo::after, .folders > .folder::after { content:""; position:absolute; left:0; top:0; height:1px; width:100%; background:var(--crimson); transform:scaleX(0); transform-origin:left; animation:line 1s var(--ease) 2.4s both; pointer-events:none; }
+  @keyframes line { 0% { transform:scaleX(0); } 60% { transform:scaleX(1); opacity:1; } 100% { transform:scaleX(1); opacity:0; } }
+  html.seen .mark, html.seen h1 .w span, html.seen .sub, html.seen .rise, html.seen .solo::after, html.seen .folders > .folder::after { animation-delay:0s !important; }
+  html.seen .solo::after, html.seen .folders > .folder::after { display:none; }
   footer { margin-top:56px; text-align:center; font-family:"JetBrains Mono", monospace; font-size:.68rem; color:var(--muted); line-height:1.8; }
   footer a { color:var(--bone); border-bottom:1px solid var(--crimson); }
   .rise { animation:rise .9s var(--ease) both; }
   @keyframes rise { from { transform:translateY(18px); } to { transform:none; } }
-  @media (prefers-reduced-motion: reduce) { .rise, .folder[open] .fbody { animation:none; } .fchev { transition:none; } .card::before, .name, .arrow { transition:none; } }
+  @media (prefers-reduced-motion: reduce) { .intro { display:none; } .rise, .folder[open] .fbody, .mark, .sub, h1 .w span, .solo::after, .folders > .folder::after { animation:none !important; } .fchev { transition:none; } .card::before, .name, .arrow { transition:none; } }
 </style>
 </head>
 <body>
+<script>try{if(sessionStorage.getItem("pf-links-intro"))document.documentElement.classList.add("seen");else sessionStorage.setItem("pf-links-intro","1");}catch(e){}</script>
+<div class="intro" aria-hidden="true">
+  <svg viewBox="0 0 24 24"><path class="liquid" d="M6.4 14.2h11.2l1.4 2.6A3.4 3.4 0 0 1 16 21H8a3.4 3.4 0 0 1-3-4.2z"/><path class="flask" d="M9 3h6M10 3v4.2L5.2 16.6A3 3 0 0 0 7.8 21h8.4a3 3 0 0 0 2.6-4.4L14 7.2V3"/></svg>
+  <p>Profumista Falso</p>
+</div>
 <main class="wrap">
-  <header class="rise">
+  <header>
     <div class="mark" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M9 3h6M10 3v3.2c0 .5-.2 1-.6 1.3A6.5 6.5 0 1 0 14.6 7.5c-.4-.3-.6-.8-.6-1.3V3"/><path d="M6.2 14h11.6" stroke-dasharray="1.5 2"/></svg>
     </div>
-    <h1>Profumista <em>Falso</em></h1>
+    <h1><span class="w"><span>Profumista</span></span> <span class="w"><span><em>Falso</em></span></span></h1>
     <p class="sub">Profumi fatti a mano, da zero.<br>Tutti i siti e il diario, in un posto solo.</p>
   </header>
 
