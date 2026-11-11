@@ -45,7 +45,15 @@
   .card:hover .arrow { transform:translate(4px,-4px); color:var(--crimson); }
   .tag { display:inline-block; margin-left:8px; vertical-align:middle; font-family:"JetBrains Mono", monospace; font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; border:1px solid var(--line); padding:3px 6px; color:var(--muted); }
   .tag.lock { border-color:rgba(196,42,78,.5); color:var(--crimson); }
-  .folders { margin-top:40px; display:grid; gap:10px; }
+  .solo { margin-top:40px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .solo .card { border-bottom:0; }
+  .folders { margin-top:18px; display:grid; gap:10px; }
+  .folder.sub { margin:10px 0; background:transparent; }
+  .folder.sub summary { padding:12px 12px; }
+  .folder.sub .ftitle { font-size:1.15rem; }
+  .folder.sub .ficon { width:18px; height:18px; }
+  .folder.sub .fbody { padding:0 12px 4px; }
+  .fbody > .folder.sub:last-child { margin-bottom:12px; }
   .folder { border:1px solid var(--line); background:rgba(23,22,26,.55); }
   .folder[open] { border-color:rgba(196,42,78,.45); }
   .folder summary { list-style:none; cursor:pointer; display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:12px; padding:16px 16px; }
@@ -78,70 +86,72 @@
     <p class="sub">Profumi fatti a mano, da zero.<br>Tutti i siti e il diario, in un posto solo.</p>
   </header>
 
-  <div class="folders">
-  <details class="folder rise" style="animation-delay:0.06s" open>
-    <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Il Diario</span><span class="fmeta">1 link</span><span class="fchev" aria-hidden="true">+</span></summary>
-    <div class="fbody">
+  <div class="solo rise" style="animation-delay:.06s">
       <a class="card" href="https://avarizia.github.io/ProfumistaFalso/">
         <span class="thumb thumb-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5z"/><path d="M8 3v18M11 8h5M11 12h5M11 16h3"/></svg></span>
         <span><span class="name">Il Diario<span class="tag lock">Lab protetto</span></span><span class="desc" style="display:block">Formule, versioni, feedback e materie prime.</span></span>
         <span class="arrow" aria-hidden="true">↗</span>
       </a>
-    </div>
-  </details>
-  <details class="folder rise" style="animation-delay:0.12s">
-    <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Profumista Falso</span><span class="fmeta">2 siti</span><span class="fchev" aria-hidden="true">+</span></summary>
+  </div>
+  <div class="folders">
+  <details class="folder rise" style="animation-delay:0.12s" open>
+    <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Concept siti</span><span class="fmeta">4 cartelle · 7 siti</span><span class="fchev" aria-hidden="true">+</span></summary>
     <div class="fbody">
-      <a class="card" href="https://profumista-falso.higgsfield.app">
+<details class="folder sub">
+    <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Concept sito rivendita</span><span class="fmeta">2 siti</span><span class="fchev" aria-hidden="true">+</span></summary>
+    <div class="fbody">
+<a class="card" href="https://profumista-falso.higgsfield.app">
         <img class="thumb" src="https://profumista-falso.higgsfield.app/assets/og.jpg" alt="" loading="lazy">
         <span><span class="name">La collezione</span><span class="desc" style="display:block">Il negozio concept: storia, collezione, metodo, su misura.</span></span>
         <span class="arrow" aria-hidden="true">↗</span>
       </a>
-      <a class="card" href="https://profumista-falso-film.higgsfield.app">
+<a class="card" href="https://profumista-falso-film.higgsfield.app">
         <img class="thumb" src="https://profumista-falso-film.higgsfield.app/assets/og.jpg" alt="" loading="lazy">
         <span><span class="name">La collezione, <i>in movimento</i></span><span class="desc" style="display:block">La versione animata: un film che scorre con lo scroll.</span></span>
         <span class="arrow" aria-hidden="true">↗</span>
       </a>
     </div>
   </details>
-  <details class="folder rise" style="animation-delay:0.18s">
+<details class="folder sub">
     <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Neve Rossa</span><span class="fmeta">3 siti</span><span class="fchev" aria-hidden="true">+</span></summary>
     <div class="fbody">
-      <a class="card" href="https://neve-rossa-01.higgsfield.app">
+<a class="card" href="https://neve-rossa-01.higgsfield.app">
         <img class="thumb" src="https://neve-rossa-01.higgsfield.app/assets/og.jpg" alt="" loading="lazy">
         <span><span class="name">Molecola 01</span><span class="desc" style="display:block">Avanguardia minimale: indice delle note e molecola in 3D.</span></span>
         <span class="arrow" aria-hidden="true">↗</span>
       </a>
-      <a class="card" href="https://neve-rossa-pf.higgsfield.app">
+<a class="card" href="https://neve-rossa-pf.higgsfield.app">
         <img class="thumb" src="https://neve-rossa-pf.higgsfield.app/assets/og.jpg" alt="" loading="lazy">
         <span><span class="name">Il film</span><span class="desc" style="display:block">Lamponi nella neve, raccontati con lo scroll.</span></span>
         <span class="arrow" aria-hidden="true">↗</span>
       </a>
-      <a class="card" href="https://neve-rossa-lab.higgsfield.app">
+<a class="card" href="https://neve-rossa-lab.higgsfield.app">
         <img class="thumb" src="https://neve-rossa-lab.higgsfield.app/assets/og.jpg" alt="" loading="lazy">
         <span><span class="name">Il laboratorio</span><span class="desc" style="display:block">Tocca la neve, versa le note, sfoglia il diario.</span></span>
         <span class="arrow" aria-hidden="true">↗</span>
       </a>
     </div>
   </details>
-  <details class="folder rise" style="animation-delay:0.24s">
+<details class="folder sub">
     <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Peach 01</span><span class="fmeta">1 sito</span><span class="fchev" aria-hidden="true">+</span></summary>
     <div class="fbody">
-      <a class="card" href="https://peach-01.higgsfield.app">
+<a class="card" href="https://peach-01.higgsfield.app">
         <img class="thumb" src="https://peach-01.higgsfield.app/assets/og.jpg" alt="" loading="lazy">
         <span><span class="name">Peach 01</span><span class="desc" style="display:block">Ex Pesca Legnosa: la pesca che si apre negli ingredienti.</span></span>
         <span class="arrow" aria-hidden="true">↗</span>
       </a>
     </div>
   </details>
-  <details class="folder rise" style="animation-delay:0.30s">
+<details class="folder sub">
     <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Molecolare 01</span><span class="fmeta">1 sito</span><span class="fchev" aria-hidden="true">+</span></summary>
     <div class="fbody">
-      <a class="card" href="https://molecolare-01.higgsfield.app">
+<a class="card" href="https://molecolare-01.higgsfield.app">
         <img class="thumb" src="https://molecolare-01.higgsfield.app/assets/og.jpg" alt="" loading="lazy">
         <span><span class="name">Molecolare 01</span><span class="desc" style="display:block">Sei molecole, nessun fiore. Un campo magnetico da toccare.</span></span>
         <span class="arrow" aria-hidden="true">↗</span>
       </a>
+    </div>
+  </details>
     </div>
   </details>
   </div>
