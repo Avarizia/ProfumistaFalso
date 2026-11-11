@@ -63,11 +63,11 @@
   .ftitle { font-family:"Bodoni Moda", Georgia, serif; font-size:1.35rem; line-height:1; }
   .fmeta { font-family:"JetBrains Mono", monospace; font-size:.64rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
   .fchev { font-family:"JetBrains Mono", monospace; font-size:1.1rem; color:var(--muted); width:1ch; text-align:center; transition:transform .4s var(--ease), color .3s; }
-  .folder[open] .fchev { transform:rotate(45deg); color:var(--crimson); }
+  .folder[open] > summary .fchev { transform:rotate(45deg); color:var(--crimson); }
   .folder summary:hover .ftitle { color:var(--crimson); }
   .fbody { padding:0 16px 6px; border-top:1px solid var(--line); }
   .fbody .card:last-child { border-bottom:0; }
-  .folder[open] .fbody { animation:open .5s var(--ease); }
+  .folder[open] > .fbody { animation:open .5s var(--ease); }
   @keyframes open { from { transform:translateY(-6px); } to { transform:none; } }
   /* intro */
   .intro { position:fixed; inset:0; z-index:50; display:grid; place-items:center; align-content:center; gap:18px; background:var(--ink); clip-path:inset(0 0 0 0); animation:curtain .9s cubic-bezier(.7,0,.2,1) 1.55s forwards; }
@@ -100,7 +100,7 @@
   footer a { color:var(--bone); border-bottom:1px solid var(--crimson); }
   .rise { animation:rise .9s var(--ease) both; }
   @keyframes rise { from { transform:translateY(18px); } to { transform:none; } }
-  @media (prefers-reduced-motion: reduce) { .intro { display:none; } .rise, .folder[open] .fbody, .mark, .sub, h1 .w span, .solo::after, .folders > .folder::after { animation:none !important; } .fchev { transition:none; } .card::before, .name, .arrow { transition:none; } }
+  @media (prefers-reduced-motion: reduce) { .intro { display:none; } .rise, .folder[open] > .fbody, .mark, .sub, h1 .w span, .solo::after, .folders > .folder::after { animation:none !important; } .fchev { transition:none; } .card::before, .name, .arrow { transition:none; } }
 </style>
 </head>
 <body>
@@ -127,7 +127,7 @@
   </div>
   <div class="folders">
   <details class="folder rise" style="animation-delay:0.12s" open>
-    <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Concept siti</span><span class="fmeta">4 cartelle · 7 siti</span><span class="fchev" aria-hidden="true">+</span></summary>
+    <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Concept siti</span><span class="fmeta">7 siti</span><span class="fchev" aria-hidden="true">+</span></summary>
     <div class="fbody">
 <details class="folder sub">
     <summary><svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg><span class="ftitle">Concept sito rivendita</span><span class="fmeta">2 siti</span><span class="fchev" aria-hidden="true">+</span></summary>
