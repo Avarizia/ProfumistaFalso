@@ -446,6 +446,9 @@ b,strong,.tabs button[aria-selected=true]{font-weight:500}
 .tabs{background:var(--surface)}
 .ico{color:var(--amber)}
 .style{font-weight:300!important}
+.tile.todo{color:var(--gold)!important;background:rgba(198,161,101,.07)!important;border-color:rgba(198,161,101,.5)!important}
+.tile.todo *{color:inherit}
+.tile.todo .meta,.tile.todo small{color:rgba(198,161,101,.7)!important}
 #intro{position:fixed;inset:0;z-index:999;background:var(--bg);display:grid;place-items:center;pointer-events:none;animation:inout 1.1s cubic-bezier(.4,0,.2,1) 2.1s forwards}
 #intro .drop{width:16px;height:16px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--amber);animation:fall .8s cubic-bezier(.55,0,.9,.4) .1s both}
 #intro .bloom{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--amber);transform:scale(0);animation:bloom 1.2s cubic-bezier(.16,1,.3,1) .85s forwards}
